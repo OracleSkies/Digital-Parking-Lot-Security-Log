@@ -50,7 +50,8 @@ cursor.execute(""" CREATE TABLE Parking Lot Security Log (
     studentNumber int
     firstName text,
     lastName text,
-    vehicleType text,
+    department text,
+    vehicleType text
 
 )""")
 '''
