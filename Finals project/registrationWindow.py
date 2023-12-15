@@ -14,7 +14,14 @@ root.resizable(False,False)
 
 
 #var
-DEPTOPT=["College of Engineering","College of Education","College of Arts and Sciences","College of Allied Health and Sciences","College of Business Administration and Accountancy","College of Computing Studies"] 
+DEPTOPT=["College of Engineering",
+    "College of Education",
+    "College of Arts and Sciences",
+    "College of Allied Health and Sciences",
+    "College of Business Administration and Accountancy",
+    "College of Computing Studies"
+    ] 
+
 selected_DEPT= tk.StringVar()
 selected_DEPT.set("Department")
 
