@@ -5,8 +5,8 @@ from PIL import ImageTk, Image
 root= tk.Tk()
 root.title("PNC Parking Registration")
 root.geometry("800x450")
-root.iconbitmap(r"C:\Users\Admin\Downloads\334524180_902897874326778_6090952642815903161_n.ico")
-image_0=Image.open(r"C:\Users\Admin\Downloads\410416337_675750344428577_6935728864826318124_n.png")
+root.iconbitmap("PNCLogo.ico")
+image_0=Image.open("main_regwindow_bg.png")
 bck_end=ImageTk.PhotoImage(image_0)
 lbl=Label(root,image=bck_end)
 lbl.grid(row=0, column=0)
@@ -65,7 +65,4 @@ VehiclePDF.place(relx=0.6, rely=0.672)
 Reg_button= tk.Button(root, text="Register", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18)
 Reg_button.place(relx= 0.4, rely=0.85)
 
-
-#SHEEESSHHHHHHSHHHSHSHSHSHSH
-#SHEEEEEESHHHHABLEEEEEEEEEEEEEEE
 root.mainloop()
