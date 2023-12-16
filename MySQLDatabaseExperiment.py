@@ -56,6 +56,7 @@ titleLabel = Label(root, text="Experiment Customer Database", font=("Helvatica",
 titleLabel.grid(row=0, column=0, columnspan=2, pady=10, padx=10)
 
 #main form for fields
+#labels
 firstNameLabel = Label(root, text="First Name").grid(row=1, column=0, sticky=W, padx=10)
 lastNameLabel = Label(root, text="Last Name").grid(row=2, column=0, sticky=W, padx=10)
 addressIDLabel = Label(root, text="Address").grid(row=3, column=0, sticky=W, padx=10)
@@ -63,5 +64,23 @@ priceLabel = Label(root, text="Price").grid(row=4, column=0, sticky=W, padx=10)
 emailLabel = Label(root, text="Email").grid(row=5, column=0, sticky=W, padx=10)
 cityLabel = Label(root, text="City").grid(row=6, column=0, sticky=W, padx=10)
 phoneLabel = Label(root, text="Phone Number").grid(row=7, column=0, sticky=W, padx=10)
+#entry boxes
+firstNameEntry = Entry(root)
+firstNameEntry.grid(row=1, column=1)
+lastNameEntry = Entry(root)
+lastNameEntry.grid(row=2, column=1,pady=5)
+addressIDEntry = Entry(root)
+addressIDEntry.grid(row=3, column=1,pady=5)
+priceEntry = Entry(root)
+priceEntry.grid(row=4, column=1,pady=5)
+emailEntry = Entry(root)
+emailEntry.grid(row=5, column=1,pady=5)
+cityEntry = Entry(root)
+cityEntry.grid(row=6, column=1,pady=5)
+phoneEntry = Entry(root)
+phoneEntry.grid(row=7, column=1,pady=5)
+#buttons
+submitButton = Button(root, text="Submit")
+submitButton.grid(row=8, column=0, columnspan=2,padx=10,pady=10)
 
 root.mainloop()
