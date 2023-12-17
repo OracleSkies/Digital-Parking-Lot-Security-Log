@@ -111,10 +111,8 @@ def searchCustomer():
         name = (searched, )
         result = cursor.execute(sql, name)
         result = cursor.fetchall()
-
         if not result:
             result = "Record Not Found"
-        
         searchedLabel = Label(searchCustomerWindow, text=result)
         searchedLabel.grid(row=2, column=0, padx=10, columnspan=2)
 
