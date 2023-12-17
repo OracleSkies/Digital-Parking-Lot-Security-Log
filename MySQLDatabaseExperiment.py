@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import ttk
 from PIL import ImageTk,Image
 import mysql.connector
 import csv
@@ -106,24 +107,42 @@ def searchCustomer():
     searchCustomerWindow.iconbitmap('PNCLogo.ico')
     searchCustomerWindow.geometry('800x600')
     def searchNow():
+        selected = dropDown.get()
+        sql=""
+        if selected == "Search by...":
+            test = Label(searchCustomerWindow, text="Please select from the drop box")
+            test.grid(row=1, column=1)
+
+        if selected == "Last Name":
+            sql = "SELECT * FROM customers WHERE lastName = %s"
+            
+        if selected == "Email Address":
+            sql = "SELECT * FROM customers WHERE email = %s"
+            
+        if selected == "Customer ID":
+            sql = "SELECT * FROM customers WHERE userID = %s"
+    
+        
         searched = searchCustomerEntry.get()
-        sql = "SELECT * FROM customers WHERE lastName = %s"
         name = (searched, )
         result = cursor.execute(sql, name)
         result = cursor.fetchall()
         if not result:
             result = "Record Not Found"
         searchedLabel = Label(searchCustomerWindow, text=result)
-        searchedLabel.grid(row=2, column=0, padx=10, columnspan=2)
+        searchedLabel.grid(row=2, column=0, padx=10, sticky=W, columnspan=2)
+        
 
     #entry box to search for customer
     searchCustomerEntry = Entry(searchCustomerWindow)
     searchCustomerEntry.grid(row=0, column=1, padx=10, pady=10)
-    searchCustomerLabel = Label(searchCustomerWindow, text="Search Customer by Last Name: ")
+    searchCustomerLabel = Label(searchCustomerWindow, text="Search Customer: ")
     searchCustomerLabel.grid(row=0, column=0, padx=10, pady=10)
     searchButton = Button(searchCustomerWindow, text="Search", command=searchNow)
     searchButton.grid(row=1, column=0, padx=10)
-    
+    dropDown = ttk.Combobox(searchCustomerWindow, value = ["Search by...","Last Name", "Email Address","Customer ID"])
+    dropDown.current(0)
+    dropDown.grid(row=0, column=2)
 
 #Title with Label widget
 titleLabel = Label(root, text="Experiment Customer Database", font=("Helvatica", 16))
