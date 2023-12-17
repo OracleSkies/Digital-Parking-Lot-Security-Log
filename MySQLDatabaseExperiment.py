@@ -106,7 +106,17 @@ def searchCustomer():
     searchCustomerWindow.iconbitmap('PNCLogo.ico')
     searchCustomerWindow.geometry('800x600')
     def searchNow():
-        return
+        searched = searchCustomerEntry.get()
+        sql = "SELECT * FROM customers WHERE lastName = %s"
+        name = (searched, )
+        result = cursor.execute(sql, name)
+        result = cursor.fetchall()
+
+        if not result:
+            result = "Record Not Found"
+        
+        searchedLabel = Label(searchCustomerWindow, text=result)
+        searchedLabel.grid(row=2, column=0, padx=10, columnspan=2)
 
     #entry box to search for customer
     searchCustomerEntry = Entry(searchCustomerWindow)
