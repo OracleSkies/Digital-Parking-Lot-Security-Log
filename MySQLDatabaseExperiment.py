@@ -1,6 +1,7 @@
 from tkinter import *
 from PIL import ImageTk,Image
 import mysql.connector
+import csv
 
 root = Tk()
 root.title('MySQLDBExp')
@@ -14,7 +15,6 @@ db = mysql.connector.connect(
     passwd = 'password123',
     database = 'experimentDatabase',
 )
-
 
 #create and initialize cursor
 cursor = db.cursor()
@@ -60,6 +60,7 @@ def clearFields():
     cityEntry.delete(0,END)
     phoneEntry.delete(0,END)
 
+#submits information to database
 def sumbitInfo():
     sqlCommand = "INSERT INTO customers (firstName, lastName, addressID, price, email, city, phoneNumber) VALUES (%s, %s, %s, %s, %s, %s, %s)" #%s = placeholder
     values = (firstNameEntry.get(), lastNameEntry.get(), addressIDEntry.get(), priceEntry.get(), emailEntry.get(), cityEntry.get(), phoneEntry.get())
@@ -69,12 +70,52 @@ def sumbitInfo():
     #clears the fields
     clearFields()
 
+#show all info in database to another window
 def dbquery():
-    #query
+    #sets up new window
+    customerDataQuery = Tk()
+    customerDataQuery.title("Show All Data")
+    customerDataQuery.iconbitmap('PNCLogo.ico')
+    customerDataQuery.geometry('800x600')
+
+    #query/shows all data to new window
     cursor.execute("SELECT * FROM customers")
     result = cursor.fetchall()
-    for x in result:
-        print(x)
+    #medyo complicated na loop left to right, up to down
+    for index, tableRow in enumerate(result):
+        num = 0
+        for tableColumn in tableRow:
+            dataQueryLabel = Label(customerDataQuery,text=tableColumn) 
+            # add index to x to get the specific field u want (eg x[0] would give you the 0th column of the database which is the first name) 
+            dataQueryLabel.grid(row=index, column=num, padx=5)
+            num += 1
+    csvButton = Button(customerDataQuery, text="Save as Spreadsheet", command=lambda:exportToExcel(result))
+    csvButton.grid(row=index+1,column=0)
+
+#export to csv excel https://www.youtube.com/watch?v=2MMwfNKN1_s&list=PLCC34OHNcOtoC6GglhF3ncJ5rLwQrLGnV&index=32
+def exportToExcel(_result):
+    with open("customer.csv", "a", newline="") as file:
+        writer = csv.writer(file, dialect='excel')
+        for record in _result:
+            writer.writerow(record)
+
+#search for customers using their names
+def searchCustomer():
+    searchCustomerWindow = Tk()
+    searchCustomerWindow.title("Search for Customer")
+    searchCustomerWindow.iconbitmap('PNCLogo.ico')
+    searchCustomerWindow.geometry('800x600')
+    def searchNow():
+        return
+
+    #entry box to search for customer
+    searchCustomerEntry = Entry(searchCustomerWindow)
+    searchCustomerEntry.grid(row=0, column=1, padx=10, pady=10)
+    searchCustomerLabel = Label(searchCustomerWindow, text="Search Customer by Last Name: ")
+    searchCustomerLabel.grid(row=0, column=0, padx=10, pady=10)
+    searchButton = Button(searchCustomerWindow, text="Search", command=searchNow)
+    searchButton.grid(row=1, column=0, padx=10)
+    
 
 #Title with Label widget
 titleLabel = Label(root, text="Experiment Customer Database", font=("Helvatica", 16))
@@ -106,11 +147,12 @@ phoneEntry = Entry(root)
 phoneEntry.grid(row=7, column=1,pady=5)
 #buttons
 submitButton = Button(root, text="Submit", command=sumbitInfo)
-submitButton.grid(row=8, column=0,padx=10,pady=10)
+submitButton.grid(row=8, column=0,padx=10, pady=10)
 clearFieldsButton = Button(root, text="Clear",command=clearFields)
 clearFieldsButton.grid(row=8, column=1)
+queryButton = Button(root, text="Show All Data", command=dbquery)
+queryButton.grid(row=9, column=0, sticky=W, padx=10)
+searchCustomersButton = Button(root,text="Search for Customers", command=searchCustomer)
+searchCustomersButton.grid(row=9, column=1, sticky=W, padx=10)
 
-#query button. Trash this
-queryButton = Button(root, text="Query", command=dbquery)
-queryButton.grid(row=9, column=0)
 root.mainloop()
