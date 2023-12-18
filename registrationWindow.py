@@ -7,9 +7,9 @@ import csv
 
 '''
 ===SCRIPT Tasks===
-gumawa ng interaction from here to scanWindow.py using button
-maglagay ng messagebox na nagsasabing registered na ang user
-icoclose ang window kapag registered na ang user
+GOODS >>> gumawa ng interaction from here to scanWindow.py using button
+GOODS >>> maglagay ng messagebox na nagsasabing registered na ang user
+GOODS >>> icoclose ang window kapag registered na ang user
 '''
 
 
@@ -63,6 +63,17 @@ def registerUser():
     values = (fNameField.get(), lNameField.get(), StudentNoField.get(), deptOptionsDrpDwn.get(), vehicleOptionsDrpDwn.get())
     cursor.execute(sqlCommand, values)
     DB.commit()
+    messagebox.showinfo("Parking registration", "Registration Sucessful")
+    root.destroy()
+    with open('scanWindow.py','r') as file:
+        pythonCode = file.read()
+        exec(pythonCode)
+
+def goToScanWindow():
+    root.destroy()
+    with open('scanWindow.py','r') as file:
+        pythonCode = file.read()
+        exec(pythonCode)
 
 def dbquery(): #this function is temporary. This just shows all data in the table
     dataQuery = Tk()
@@ -133,6 +144,8 @@ VehiclePDF.place(relx=0.6, rely=0.672)
 Reg_button = Button(root, text="Register", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command=registerUser)
 Reg_button.place(relx= 0.4, rely=0.85)
 
+backButton = Button(root, text="Go Back", bg="gray" ,font=("Microsoft YaHei UI Light",10,"bold"),width=10, command=goToScanWindow)
+backButton.place(relx= 0.7, rely=0.85)
 
 #temporary buttons
 test_button = Button(root, text="Query", bg="yellow" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command=dbquery)
