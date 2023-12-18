@@ -1,6 +1,7 @@
 
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 from PIL import ImageTk, Image
 import mysql.connector
 import csv
@@ -15,36 +16,65 @@ lbl=Label(root,image=bck_end)
 lbl.grid(row=0, column=0)
 root.resizable(False,False)
 
-#database = 
+#connection to MySQL
+DB = mysql.connector.connect(
+    host = 'localhost',
+    user = 'root',
+    passwd = 'password123',
+    database = 'registeredParkingUsersDatabase',
+)
+#print(DB) #check if connected to MySQL
 
-#var
-#change to combobox
-deptOptionsDrpDwn = ttk.Combobox(root, value = ["Select Department","College of Engineering", "College of Education", "College of Arts and Sciences", "College of Allied Health and Sciences", "College of Business Administration and Accountancy", "College of Computing Studies"])
-deptOptionsDrpDwn.current(0)
-deptOptionsDrpDwn.place(relx=0.4, rely=0.525, width=305)
+#create and Init cursor
+cursor = DB.cursor()
+cursor.execute("CREATE DATABASE IF NOT EXISTS registeredParkingUsersDatabase")
 
-vehicleOptionsDrpDwn = ttk.Combobox(root, value = ["Select Type of Vehicle","Bike", "E-Bike", "Motorcycle"," Car"])
-vehicleOptionsDrpDwn.current(0)
-vehicleOptionsDrpDwn.place(relx=0.4,rely=0.672)
+#database creation test
 '''
-DEPTOPT=["College of Engineering",
-    "College of Education",
-    "College of Arts and Sciences",
-    "College of Allied Health and Sciences",
-    "College of Business Administration and Accountancy",
-    "College of Computing Studies"
-    ] 
-
-selected_DEPT = StringVar()
-selected_DEPT.set("Department")
-
-#change to combobox
-TOVOPT=["Bike", "E-Bike", "Motorcycle"," Car "]
-selected_TOVOPT= StringVar()
-selected_TOVOPT.set("Type of Vehicle")
+cursor.execute("SHOW DATABASES")
+for db in cursor:
+    print(db)
 '''
+#delete Table
+#cursor.execute('DROP TABLE registeredUsers')
 
+#create table
+cursor.execute("CREATE TABLE IF NOT EXISTS registeredUsers (\
+    userID INT AUTO_INCREMENT PRIMARY KEY,\
+    firstName VARCHAR(255), \
+    lastName VARCHAR(255), \
+    studentNumber INT(20), \
+    department VARCHAR(255), \
+    vehicleType VARCHAR(255))")
 
+'''
+    idagdag to kapag na-code na ung file handling for pictures
+    userPhoto VARCHAR(255), \
+    vechiclePhoto VARCHAR(255)\
+    '''
+
+def registerUser():
+    sqlCommand = "INSERT INTO registeredUsers (firstName, lastName, studentNumber, department, vehicleType) VALUES (%s, %s, %s, %s, %s)"
+    values = (fNameField.get(), lNameField.get(), StudentNoField.get(), deptOptionsDrpDwn.get(), vehicleOptionsDrpDwn.get())
+    cursor.execute(sqlCommand, values)
+    DB.commit()
+
+def dbquery(): #this function is temporary. This just shows all data in the table
+    dataQuery = Tk()
+    dataQuery.title("Data Query")
+    dataQuery.geometry('800x600')
+    cursor.execute("SELECT * FROM registeredUsers")
+    result = cursor.fetchall()
+    for index, tableRow in enumerate(result):
+        num = 0
+        for tableColumn in tableRow:
+            dataQueryLabel = Label(dataQuery,text=tableColumn) 
+            # add index to x to get the specific field u want (eg x[0] would give you the 0th column of the database which is the first name) 
+            dataQueryLabel.grid(row=index, column=num, padx=5)
+            num += 1
+
+def onEntryClick(event):
+    lNameField.delete(0,END)
 #text/labels
 heading = Label(root, text="Registration Form",bg="darkgreen", font=("Microsoft YaHei UI Light", 15,"bold"),width=40)
 heading.place(relx=0.2, rely=0.2)
@@ -59,6 +89,7 @@ Vehicle.place(relx=0.2,rely=0.675)
 fNameField= Entry(root, width=20,fg="gray",border=2, bg="white", font=("Microsoft YaHei UI Light", 10))
 fNameField.place(relx=0.4, rely=0.3)
 fNameField.insert(0,"First Name")
+fNameField.bind("<Button-1>",onEntryClick)
 
 lNameField= Entry(root, width=20, fg="gray",border=2, bg="white", font=("Microsoft YaHei UI Light",10))
 lNameField.place(relx=0.6, rely=0.3)
@@ -68,15 +99,14 @@ StudentNoField= Entry(root, width=43, fg="gray", border=2, bg="white",font=("Mic
 StudentNoField.place(relx=0.4,rely=0.425)
 StudentNoField.insert(0,"Faculty / Student No.")
 
+#Combo Boxes
+deptOptionsDrpDwn = ttk.Combobox(root, value = ["Select Department","College of Engineering", "College of Education", "College of Arts and Sciences", "College of Allied Health and Sciences", "College of Business Administration and Accountancy", "College of Computing Studies"])
+deptOptionsDrpDwn.current(0)
+deptOptionsDrpDwn.place(relx=0.4, rely=0.525, width=305)
 
-#Optionmenus
-'''
-DEPTOPTIONS= OptionMenu(root, selected_DEPT, *DEPTOPT)
-DEPTOPTIONS.place(relx=0.4, rely=0.525)
-
-TOVOPTIONS= OptionMenu(root,selected_TOVOPT,*TOVOPT)
-TOVOPTIONS.place(relx=0.4,rely=0.672)
-'''
+vehicleOptionsDrpDwn = ttk.Combobox(root, value = ["Select Type of Vehicle","Bike", "E-Bike", "Motorcycle"," Car"])
+vehicleOptionsDrpDwn.current(0)
+vehicleOptionsDrpDwn.place(relx=0.4,rely=0.672)
 
 #Buttons
 PicHolder= Button(root, text="PHOTO HERE", bg="white", width=20,height=8)
@@ -85,7 +115,9 @@ PicHolder.place(relx=0.2, rely=0.3)
 VehiclePDF= Button(root, text="Upload Vehicle PDF", bg="white", width=20)
 VehiclePDF.place(relx=0.6, rely=0.672)
 
-Reg_button = Button(root, text="Register", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18)
+Reg_button = Button(root, text="Register", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command=registerUser)
 Reg_button.place(relx= 0.4, rely=0.85)
 
+test_button = Button(root, text="Query", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command=dbquery)
+test_button.place(relx= 0.4, rely=0.75)
 root.mainloop()
