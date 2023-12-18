@@ -72,9 +72,11 @@ def dbquery(): #this function is temporary. This just shows all data in the tabl
             # add index to x to get the specific field u want (eg x[0] would give you the 0th column of the database which is the first name) 
             dataQueryLabel.grid(row=index, column=num, padx=5)
             num += 1
+    
 
 def onEntryClick(event):
-    lNameField.delete(0,END)
+    fNameField.delete(0,END)
+
 #text/labels
 heading = Label(root, text="Registration Form",bg="darkgreen", font=("Microsoft YaHei UI Light", 15,"bold"),width=40)
 heading.place(relx=0.2, rely=0.2)
@@ -120,4 +122,5 @@ Reg_button.place(relx= 0.4, rely=0.85)
 
 test_button = Button(root, text="Query", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command=dbquery)
 test_button.place(relx= 0.4, rely=0.75)
+
 root.mainloop()
