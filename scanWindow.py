@@ -3,8 +3,9 @@ from PIL import ImageTk, Image
 import mysql.connector
 
 '''
-===SCRIPT DESCRIPTION===
-try iconnect sa registeredParkingUsersDatabase and script na to
+===SCRIPT Tasks===
+GOODS na to >>> try iconnect sa registeredParkingUsersDatabase and script na to 
+Implement Database Lookup for registered parking users
 '''
 
 #window
@@ -27,7 +28,8 @@ DB = mysql.connector.connect(
 #print(DB) #check if connected to MySQL
 
 cursor = DB.cursor()
-def dbquery():
+
+def dbquery(): #temporary function. Trash this later
     dataQuery = Tk()
     dataQuery.title("Data Query")
     dataQuery.geometry('800x600')
@@ -37,7 +39,6 @@ def dbquery():
         num = 0
         for tableColumn in tableRow:
             dataQueryLabel = Label(dataQuery,text=tableColumn) 
-            # add index to x to get the specific field u want (eg x[0] would give you the 0th column of the database which is the first name) 
             dataQueryLabel.grid(row=index, column=num, padx=5)
             num += 1
 
@@ -60,6 +61,7 @@ scanIDfield.place(relx=0.33,rely=0.54)
 confirmButton= Button(root, text="Confirm", bg="darkgreen" ,font=("Microsoft YaHei UI Light",8,"bold"),width=10)
 confirmButton.place(relx=0.4,rely=0.7)
 
+#temporary button. trash this later
 queryButton= Button(root, text="query", bg="darkgreen" ,font=("Microsoft YaHei UI Light",8,"bold"),width=10, command=dbquery)
 queryButton.place(relx=0.4,rely=0.8)
 

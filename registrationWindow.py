@@ -1,10 +1,17 @@
-
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from PIL import ImageTk, Image
 import mysql.connector
 import csv
+
+'''
+===SCRIPT Tasks===
+gumawa ng interaction from here to scanWindow.py using button
+maglagay ng messagebox na nagsasabing registered na ang user
+icoclose ang window kapag registered na ang user
+'''
+
 
 root = Tk()
 root.title("PNC Parking Registration")
