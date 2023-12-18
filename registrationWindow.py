@@ -35,8 +35,6 @@ cursor.execute("SHOW DATABASES")
 for db in cursor:
     print(db)
 '''
-#delete Table
-#cursor.execute('DROP TABLE registeredUsers')
 
 #create table
 cursor.execute("CREATE TABLE IF NOT EXISTS registeredUsers (\
@@ -72,10 +70,15 @@ def dbquery(): #this function is temporary. This just shows all data in the tabl
             # add index to x to get the specific field u want (eg x[0] would give you the 0th column of the database which is the first name) 
             dataQueryLabel.grid(row=index, column=num, padx=5)
             num += 1
-    
+def clearDB():
+    cursor.execute('DROP TABLE registeredUsers')
 
-def onEntryClick(event):
+def fNameClearOnClick(event):
     fNameField.delete(0,END)
+def lNameClearOnClick(event):
+    lNameField.delete(0,END)
+def studentNoClearOnClick(event):
+    StudentNoField.delete(0,END)
 
 #text/labels
 heading = Label(root, text="Registration Form",bg="darkgreen", font=("Microsoft YaHei UI Light", 15,"bold"),width=40)
@@ -88,18 +91,20 @@ Vehicle= Label(root, text="  VEHICLE  ",font=("Microsoft YaHei UI Light", 12,"bo
 Vehicle.place(relx=0.2,rely=0.675)
 
 #input/entry
-fNameField= Entry(root, width=20,fg="gray",border=2, bg="white", font=("Microsoft YaHei UI Light", 10))
+fNameField= Entry(root, width=20,fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light", 10))
 fNameField.place(relx=0.4, rely=0.3)
 fNameField.insert(0,"First Name")
-fNameField.bind("<Button-1>",onEntryClick)
+fNameField.bind("<Button-1>",fNameClearOnClick)
 
-lNameField= Entry(root, width=20, fg="gray",border=2, bg="white", font=("Microsoft YaHei UI Light",10))
+lNameField= Entry(root, width=20, fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light",10))
 lNameField.place(relx=0.6, rely=0.3)
 lNameField.insert(0,"Last Name")
+lNameField.bind("<Button-1>",lNameClearOnClick)
 
-StudentNoField= Entry(root, width=43, fg="gray", border=2, bg="white",font=("Microsoft YaHei UI Light",10))
+StudentNoField= Entry(root, width=43, fg="black", border=2, bg="white",font=("Microsoft YaHei UI Light",10))
 StudentNoField.place(relx=0.4,rely=0.425)
 StudentNoField.insert(0,"Faculty / Student No.")
+StudentNoField.bind("<Button-1>",studentNoClearOnClick)
 
 #Combo Boxes
 deptOptionsDrpDwn = ttk.Combobox(root, value = ["Select Department","College of Engineering", "College of Education", "College of Arts and Sciences", "College of Allied Health and Sciences", "College of Business Administration and Accountancy", "College of Computing Studies"])
@@ -120,7 +125,12 @@ VehiclePDF.place(relx=0.6, rely=0.672)
 Reg_button = Button(root, text="Register", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command=registerUser)
 Reg_button.place(relx= 0.4, rely=0.85)
 
-test_button = Button(root, text="Query", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command=dbquery)
+
+#temporary buttons
+test_button = Button(root, text="Query", bg="yellow" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command=dbquery)
 test_button.place(relx= 0.4, rely=0.75)
+
+cleardb_button = Button(root, text="Clear database", bg="yellow" ,font=("Microsoft YaHei UI Light",10,"bold"),width=12, command=clearDB)
+cleardb_button.place(relx= 0.65, rely=0.75)
 
 root.mainloop()
