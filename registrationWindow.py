@@ -70,7 +70,8 @@ def dbquery(): #this function is temporary. This just shows all data in the tabl
             # add index to x to get the specific field u want (eg x[0] would give you the 0th column of the database which is the first name) 
             dataQueryLabel.grid(row=index, column=num, padx=5)
             num += 1
-def clearDB():
+
+def clearDB(): #temporary function
     cursor.execute('DROP TABLE registeredUsers')
 
 def fNameClearOnClick(event):
