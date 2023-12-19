@@ -6,12 +6,9 @@ import mysql.connector
 import csv
 
 '''
-===SCRIPT Tasks===
-GOODS >>> gumawa ng interaction from here to scanWindow.py using button
-GOODS >>> maglagay ng messagebox na nagsasabing registered na ang user
-GOODS >>> icoclose ang window kapag registered na ang user
+=== SCRIPT TASKS === 
+add export to excel button?
 '''
-
 
 root = Tk()
 root.title("PNC Parking Registration")
