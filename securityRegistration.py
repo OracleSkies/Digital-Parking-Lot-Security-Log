@@ -52,12 +52,26 @@ def registerSecurity():
     sqlCommand = "INSERT INTO registeredSecurity (firstName, lastName, username, password) VALUES (%s, %s, %s, %s)"
     values = (fNameField.get(), lNameField.get(), usernameField.get(), pwField.get())
     cursor.execute(sqlCommand, values)
-    DBcommit()
+    DB.commit()
+
+def dbquery(): #this function is temporary. This just shows all data in the table
+    dataQuery = Tk()
+    dataQuery.title("Data Query")
+    dataQuery.geometry('800x600')
+    cursor.execute("SELECT * FROM registeredSecurity")
+    result = cursor.fetchall()
+    for index, tableRow in enumerate(result):
+        num = 0
+        for tableColumn in tableRow:
+            dataQueryLabel = Label(dataQuery,text=tableColumn) 
+            # add index to x to get the specific field u want (eg x[0] would give you the 0th column of the database which is the first name) 
+            dataQueryLabel.grid(row=index, column=num, padx=5)
+            num += 1
 
 def varTrace(var, index, mode):
     fieldContentLogic(pwVar,pwField)
-    #fieldContentLogic(confirmVar,confirmPwField)
-    
+    fieldContentLogic(confirmVar,confirmPwField)
+
 
 def fieldContentLogic(_var,_field):
     if _field == pwField:
@@ -81,6 +95,9 @@ def pwClearOnClick(event):
     pwField.delete(0,END)
 def confirmClearOnClick(event):
     confirmPwField.delete(0,END)
+
+def clearDB(): #temporary function
+    cursor.execute('DROP TABLE registeredSecurity')
 
 #text/labels
 loginText= Label(root, text="Security Registration",font="berlinsans",bg="darkgreen",width=30, height=1,)
@@ -119,8 +136,6 @@ confirmPwField.place(relx=0.3, rely=0.56)
 confirmPwField.insert(0,"                        Confirm Password")
 confirmPwField.bind("<Button-1>",confirmClearOnClick)
 
-
-
 #buttons
 PicHolder=Button(root, text="PHOTO HERE", bg="white", width=15,height=6)
 PicHolder.place(relx=0.3, rely=0.63)
@@ -128,7 +143,13 @@ PicHolder.place(relx=0.3, rely=0.63)
 UploadButton= Button(root,text="Upload photo", bg="white", width=15)
 UploadButton.place(relx=0.49,rely=0.67)
 
-Reg_button= Button(root, text="Register", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18)
+Reg_button= Button(root, text="Register", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command = registerSecurity)
 Reg_button.place(relx= 0.46, rely=0.78)
+
+querybutton= Button(root, text="Query", bg="yellow" ,font=("Microsoft YaHei UI Light",10,"bold"),width=10, command = dbquery)
+querybutton.place(relx= 0.7, rely=0.78)
+
+clearDBbutton= Button(root, text="clear DB", bg="yellow" ,font=("Microsoft YaHei UI Light",10,"bold"),width=10, command = clearDB)
+clearDBbutton.place(relx= 0.85, rely=0.78)
 
 root.mainloop()
