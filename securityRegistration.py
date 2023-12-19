@@ -56,7 +56,7 @@ def registerSecurity():
 
 def varTrace(var, index, mode):
     fieldContentLogic(pwVar,pwField)
-    fieldContentLogic(cPwVar,confirmPwField)
+    #fieldContentLogic(confirmVar,confirmPwField)
     
 
 def fieldContentLogic(_var,_field):
@@ -71,7 +71,16 @@ def fieldContentLogic(_var,_field):
         else:
             _field.config(show="")
 
-
+def fNameClearOnClick(event):
+    fNameField.delete(0,END)
+def lNameClearOnClick(event):
+    lNameField.delete(0,END)
+def usernameClearOnClick(event):
+    usernameField.delete(0,END)
+def pwClearOnClick(event):
+    pwField.delete(0,END)
+def confirmClearOnClick(event):
+    confirmPwField.delete(0,END)
 
 #text/labels
 loginText= Label(root, text="Security Registration",font="berlinsans",bg="darkgreen",width=30, height=1,)
@@ -82,14 +91,18 @@ loginText.place(relx=0.31, rely=0.25,)
 fNameField= Entry(root, width=20,fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light", 9))
 fNameField.place(relx=0.3, rely=0.35)
 fNameField.insert(0,"First Name")
+fNameField.bind("<Button-1>",fNameClearOnClick)
+
 
 lNameField= Entry(root, width=20, fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light",9))
 lNameField.place(relx=0.485, rely=0.35)
 lNameField.insert(0,"Last Name")
+lNameField.bind("<Button-1>",lNameClearOnClick)
 
 usernameField= Entry(root, width=40,fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light", 9))
 usernameField.place(relx=0.3, rely=0.42)
 usernameField.insert(0,"                            Username")
+usernameField.bind("<Button-1>",usernameClearOnClick)
 
 #put some logic for the show="*" para makita ung text
 pwVar = StringVar()
@@ -97,12 +110,14 @@ pwVar.trace_add('write', varTrace)
 pwField= Entry(root, textvariable = pwVar, width=40, fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light", 9))
 pwField.place(relx=0.3, rely=0.49)
 pwField.insert(0,"                             Password")
+pwField.bind("<Button-1>",pwClearOnClick)
 
-cPwVar = StringVar()
-cPwVar.trace_add('write', varTrace)
-confirmPwField= Entry(root, textvariable = cPwVar, width=40, fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light", 9))
+confirmVar = StringVar()
+confirmVar.trace_add('write', varTrace)
+confirmPwField= Entry(root, textvariable = confirmVar, width=40, fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light", 9))
 confirmPwField.place(relx=0.3, rely=0.56)
 confirmPwField.insert(0,"                        Confirm Password")
+confirmPwField.bind("<Button-1>",confirmClearOnClick)
 
 
 
