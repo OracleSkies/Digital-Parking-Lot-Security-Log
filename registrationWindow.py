@@ -51,7 +51,7 @@ cursor.execute("CREATE TABLE IF NOT EXISTS registeredUsers (\
 
 '''
     idagdag to kapag na-code na ung file handling for pictures
-    userPhoto VARCHAR(255), \
+    userPhoto VARCHAR(255), \ # gumamit ng VARCHAR kasi ififile handle ung name ng image file
     vechiclePhoto VARCHAR(255)\
     '''
 
