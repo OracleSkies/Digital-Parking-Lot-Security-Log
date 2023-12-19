@@ -7,8 +7,8 @@ from PIL import ImageTk, Image
 root = tk.Tk()
 root.title("PNC Parking")
 root.geometry("800x450")
-root.iconbitmap(r"C:\Users\Admin\Downloads\334524180_902897874326778_6090952642815903161_n.ico")
-image_0=Image.open(r"C:\Users\Admin\Downloads\main_statuswin_bg.png")
+root.iconbitmap("PNCLogo.ico")
+image_0=Image.open("parkingStatusWindowBG.png")
 bck_end=ImageTk.PhotoImage(image_0)
 lbl=Label(root,image=bck_end)
 lbl.grid(row=0, column=0)
@@ -61,6 +61,6 @@ PicHolder=tk.Button(root, text="PHOTO HERE", bg="white", width=20,height=8)
 PicHolder.place(relx=0.03, rely=0.2)
 
 DoneButton=tk.Button(root, text="Done", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=12)
-DoneButton.place(relx=0.48,rely=0.92)
+DoneButton.place(relx=0.48,rely=0.9)
 
 root.mainloop()
