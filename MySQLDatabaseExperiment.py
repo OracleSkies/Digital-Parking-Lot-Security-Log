@@ -106,6 +106,7 @@ def searchCustomer():
     searchCustomerWindow.title("Search for Customer")
     searchCustomerWindow.iconbitmap('PNCLogo.ico')
     searchCustomerWindow.geometry('800x600')
+
     def searchNow():
         selected = dropDown.get()
         sql=""
@@ -121,16 +122,26 @@ def searchCustomer():
             
         if selected == "Customer ID":
             sql = "SELECT * FROM customers WHERE userID = %s"
-    
-        
+
         searched = searchCustomerEntry.get()
         name = (searched, )
         result = cursor.execute(sql, name)
         result = cursor.fetchall()
         if not result:
             result = "Record Not Found"
-        searchedLabel = Label(searchCustomerWindow, text=result)
-        searchedLabel.grid(row=2, column=0, padx=10, sticky=W, columnspan=2)
+        
+        
+
+        for index, tableRow in enumerate(result):
+            num = 0
+            index += 2
+            for tableColumn in tableRow:
+                searchedLabel = Label(searchCustomerWindow, text=tableColumn)
+                searchedLabel.grid(row=index, column=num)
+                num += 1
+
+        #searchedLabel = Label(searchCustomerWindow, text=result)
+        #searchedLabel.grid(row=2, column=0, padx=10, sticky=W, columnspan=2)
         
 
     #entry box to search for customer
