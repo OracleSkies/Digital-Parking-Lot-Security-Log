@@ -14,18 +14,36 @@ lbl=Label(root,image=bck_end)
 lbl.grid(row=0, column=0)
 root.resizable(False,False)
 
+def varTrace(var,index,mode):
+    fieldContentLogic(pwVar, pwField)
+
+def fieldContentLogic(_var,_field):
+    if _var.get() != "Password":
+        _field.config(show="*")
+    else:
+        _field.config(show="")
+    
+def usernameClearOnClick(event):
+    usernameField.delete(0,END)
+def passwordClearOnClick(event):
+    pwField.delete(0,END)
+
 #text/labels
 loginText= tk.Label(root, text="SECURITY LOG IN",font="berlinsans",bg="darkgreen",width=20, height=1,)
 loginText.place(relx=0.27, rely=0.28,)
 
 #entryfields
-usernameField= tk.Entry(root, fg="gray",border=2, bg="white", font=("Microsoft YaHei UI Light", 10),width=17)
+usernameField= tk.Entry(root, fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light", 10),width=17)
 usernameField.place(relx=0.37, rely=0.42)
 usernameField.insert(0,"Username")
+usernameField.bind("<Button-1>", usernameClearOnClick)
 
-pwField= tk.Entry(root, fg="gray",border=2, bg="white", font=("Microsoft YaHei UI Light", 10),width=17)
+pwVar = StringVar()
+pwVar.trace_add('write', varTrace)
+pwField= tk.Entry(root, textvariable = pwVar, fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light", 10),width=17)
 pwField.place(relx=0.37, rely=0.52)
 pwField.insert(0,"Password")
+pwField.bind("<Button-1>", passwordClearOnClick)
 
 
 #buttons
