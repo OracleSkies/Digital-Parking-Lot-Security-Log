@@ -6,6 +6,7 @@ import mysql.connector
 ===SCRIPT Tasks===
 GOODS na to >>> try iconnect sa registeredParkingUsersDatabase and script na to 
 Implement Database Lookup for registered parking users
+need maglagay nung time aspect para sa time in and out
 '''
 
 #window
@@ -49,6 +50,7 @@ def checkUserToDatabase():
     cursor.execute(sqlCommand, stdnNumber)
     result = cursor.fetchone()
 
+    #checker lang to. Trash this
     if result:
         print("data exist")
     else:
