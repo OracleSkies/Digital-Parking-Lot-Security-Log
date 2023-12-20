@@ -77,8 +77,6 @@ def registerUser():
     with open('scanWindow.py','r') as file:
         pythonCode = file.read()
         exec(pythonCode)
-    
-    
 
 
 def goToScanWindow():

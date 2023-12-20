@@ -18,7 +18,6 @@ root.resizable(False,False)
 loginText= tk.Label(root, text="SECURITY LOG IN",font="berlinsans",bg="darkgreen",width=20, height=1,)
 loginText.place(relx=0.27, rely=0.28,)
 
-
 #entryfields
 usernameField= tk.Entry(root, fg="gray",border=2, bg="white", font=("Microsoft YaHei UI Light", 10),width=17)
 usernameField.place(relx=0.37, rely=0.42)
@@ -30,10 +29,15 @@ pwField.insert(0,"Password")
 
 
 #buttons
+registerButton= tk.Button(root, text="REGISTER", bg="darkgreen" ,width=20)
+registerButton.place(relx= 0.32, rely=0.78)
+'''
 forgotPwButton= tk.Button(root, text="Forgot Password?",bg="white")
 forgotPwButton.place(relx=0.495, rely=0.64)
-
+'''
 loginButton= tk.Button(root, text="LOG IN", bg="darkgreen" ,width=20)
-loginButton.place(relx= 0.32, rely=0.78)
+loginButton.place(relx= 0.32, rely=0.68)
+
+
 
 root.mainloop()
