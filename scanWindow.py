@@ -42,6 +42,18 @@ def dbquery(): #temporary function. Trash this later
             dataQueryLabel.grid(row=index, column=num, padx=5)
             num += 1
 
+def checkUserToDatabase():
+    sqlCommand = "SELECT * FROM registeredUsers WHERE studentNumber = %s" 
+    scannedStdnNo = scanIDfield.get()
+    stdnNumber = (scannedStdnNo, )
+    cursor.execute(sqlCommand, stdnNumber)
+    result = cursor.fetchone()
+
+    if result:
+        print("data exist")
+    else:
+        print("data doesnt exist")
+
 #label
 ParkingLotScan= Label(root, text="Parking Lot Scanner",font="berlinsans",bg="darkgreen",width=20, height=1,)
 ParkingLotScan.place(relx=0.27, rely=0.32,)
@@ -58,7 +70,7 @@ scanIDfield.place(relx=0.33,rely=0.54)
 
 
 #Button
-confirmButton= Button(root, text="Confirm", bg="darkgreen" ,font=("Microsoft YaHei UI Light",8,"bold"),width=10)
+confirmButton= Button(root, text="Confirm", bg="darkgreen" ,font=("Microsoft YaHei UI Light",8,"bold"),width=10, command=checkUserToDatabase)
 confirmButton.place(relx=0.4,rely=0.7)
 
 #temporary button. trash this later

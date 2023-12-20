@@ -56,6 +56,18 @@ cursor.execute("CREATE TABLE IF NOT EXISTS registeredUsers (\
     '''
 
 def registerUser():
+    #temporary lines ung execution
+    #database
+    cursor.execute("CREATE DATABASE IF NOT EXISTS registeredParkingUsersDatabase")
+    #table
+    cursor.execute("CREATE TABLE IF NOT EXISTS registeredUsers (\
+    userID INT AUTO_INCREMENT PRIMARY KEY,\
+    firstName VARCHAR(255), \
+    lastName VARCHAR(255), \
+    studentNumber INT(20), \
+    department VARCHAR(255), \
+    vehicleType VARCHAR(255))")
+
     sqlCommand = "INSERT INTO registeredUsers (firstName, lastName, studentNumber, department, vehicleType) VALUES (%s, %s, %s, %s, %s)"
     values = (fNameField.get(), lNameField.get(), StudentNoField.get(), deptOptionsDrpDwn.get(), vehicleOptionsDrpDwn.get())
     cursor.execute(sqlCommand, values)
@@ -65,6 +77,9 @@ def registerUser():
     with open('scanWindow.py','r') as file:
         pythonCode = file.read()
         exec(pythonCode)
+    
+    
+
 
 def goToScanWindow():
     root.destroy()
