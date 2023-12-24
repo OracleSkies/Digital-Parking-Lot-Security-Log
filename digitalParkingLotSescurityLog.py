@@ -24,8 +24,14 @@ Database = mysql.connector.connect(
 cursorMain = Database.cursor()
 cursorMain.execute("CREATE DATABASE IF NOT EXISTS registeredParkingUsersDatabase")
 
-
 def checkUserToDatabase():
+    DB = mysql.connector.connect(
+        host = 'localhost',
+        user = 'root',
+        passwd = 'password123',
+        database = 'registeredParkingUsersDatabase',
+    )
+    cursor = DB.cursor()
     sqlCommand = "SELECT * FROM registeredUsers WHERE studentNumber = %s" 
     scannedStdnNo = scanIDfield.get()
     stdnNumber = (scannedStdnNo, )
@@ -34,24 +40,25 @@ def checkUserToDatabase():
     #checker lang to. Trash this
     if result:
         sqlFName = "SELECT firstName FROM registeredUsers WHERE studentNumber = %s"
-        cursorMain.execute(sqlFName,stdnNumber)
-        resultFName = cursorMain.fetchone()
+        cursor.execute(sqlFName,stdnNumber)
+        resultFName = cursor.fetchone()
         sqlLName = "SELECT lastName FROM registeredUsers WHERE studentNumber = %s"
-        cursorMain.execute(sqlLName, stdnNumber)
-        resultLName = cursorMain.fetchone()
+        cursor.execute(sqlLName, stdnNumber)
+        resultLName = cursor.fetchone()
         firstName = resultFName[0]
         lastName = resultLName[0]
         resultName = firstName + " " + lastName
         sqlDept = "SELECT department FROM registeredUsers WHERE studentNumber = %s"
-        cursorMain.execute(sqlDept, stdnNumber)
-        resultDept = cursorMain.fetchone()
-        
-        OpenParkingStatusWindow(resultName,str(resultDept))
+        cursor.execute(sqlDept, stdnNumber)
+        resultDept = cursor.fetchone()
+        sqlTOV = "SELECT vehicleType FROM registeredUsers WHERE studentNumber = %s"
+        cursor.execute(sqlTOV, stdnNumber)
+        resultTOV = cursor.fetchone()
+        OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV)
     else: #data does not exist
         #open registration Window
         #put message box and additional ifelse logic here
         OpenParkingRegistrationWindow()
-
 
 def dbquery(): #temporary function
     dataQuery = Tk()
@@ -71,7 +78,7 @@ def releaseGrab(_window):
     _window.destroy()
     scanWindow.destroy()
 
-def OpenParkingStatusWindow(_name,_dept):
+def OpenParkingStatusWindow(_name,_dept,_stdNum,_TOV):
     parkStatWin = Toplevel(scanWindow)
     parkStatWin.title("PNC Parking")
     parkStatWin.geometry("800x450")
@@ -82,6 +89,9 @@ def OpenParkingStatusWindow(_name,_dept):
     parkStatWinBG.image = parkStatWinBackground
     parkStatWinBG.grid(row=0, column=0)
     parkStatWin.resizable(False,False)
+
+    def parkStatWinDone():
+        parkStatWin.destroy()
 
     #label
     StudentInfo=Label(parkStatWin, text="Student Information",font=("berlinsans",20,"bold"),bg="darkgreen",width=47, height=2,)
@@ -102,14 +112,14 @@ def OpenParkingStatusWindow(_name,_dept):
     StudentNo=Label(parkStatWin, text="Student No.",font=("berlinsans",15),bg="lightgreen" ,width=10, height=1)
     StudentNo.place(relx=0.03, rely=0.52)
 
-    StudentNoFill=Label(parkStatWin, text="               ",font=("berlinsans",15),bg="lightgreen" ,width=20, height=1)
+    StudentNoFill=Label(parkStatWin, text=_stdNum,font=("berlinsans",15),bg="lightgreen" ,width=20, height=1)
     StudentNoFill.place(relx=0.17, rely=0.52)
 
     RegisteredVehicle= Label(parkStatWin, text="Type of Vehicle:",font=("berlinsans",15),bg="lightgreen" ,width=13, height=1)
     RegisteredVehicle.place(relx=0.03, rely=0.62)
 
 
-    RegisteredVehicleFill= Label(parkStatWin, text="        ",font=("berlinsans",15),bg="lightgreen" ,width=18, height=1)
+    RegisteredVehicleFill= Label(parkStatWin, text=_TOV,font=("berlinsans",15),bg="lightgreen" ,width=18, height=1)
     RegisteredVehicleFill.place(relx=0.21, rely=0.62)
 
     TimeIn=Label(parkStatWin, text="Time in:",font=("berlinsans",15),bg="gray" ,width=7, height=1)
@@ -128,7 +138,7 @@ def OpenParkingStatusWindow(_name,_dept):
     PicHolder=Button(parkStatWin, text="PHOTO HERE", bg="white", width=20,height=8)
     PicHolder.place(relx=0.03, rely=0.2)
 
-    DoneButton=Button(parkStatWin, text="Done", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=12)
+    DoneButton=Button(parkStatWin, text="Done", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=12, command=parkStatWinDone)
     DoneButton.place(relx=0.48,rely=0.9)
 
 def OpenSecurityLogInWindow():
@@ -408,6 +418,7 @@ def OpenParkingRegistrationWindow():
         cursor.execute(sqlCommand, values)
         DB.commit()
         messagebox.showinfo("Parking registration", "Registration Sucessful")
+        parkRegWin.destroy()
 
     def goToScanWindow():
         parkRegWin.destroy()
