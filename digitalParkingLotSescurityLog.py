@@ -106,10 +106,10 @@ def OpenSecurityLogInWindow():
         cursor.execute(sqlCommand, account)
         result = cursor.fetchone()
         if result:
-            #messagebox
+            messagebox.showinfo("Security Log-In","Account successfully logged in")
             securityLogInWindow.destroy()
         else:
-            print("data doesnt exist")
+            messagebox.showinfo("Security Log-In", "Account not found")
 
     #entryfields
     usernameField= Entry(securityLogInWindow, fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light", 10),width=17)
@@ -166,13 +166,19 @@ def OpenSecurityRegistration():
     '''
 
     def registerSecurity():
-        sqlCommand = "INSERT INTO registeredSecurity (firstName, lastName, username, password) VALUES (%s, %s, %s, %s)"
-        values = (fNameField.get(), lNameField.get(), usernameField.get(), pwField.get())
-        cursor.execute(sqlCommand, values)
-        DB.commit()
-        messagebox.showinfo("Security Account Registration","Account Successfully Registered")
+        password = pwField.get() 
+        confirm = confirmPwField.get()
+        if password == confirm:
+            sqlCommand = "INSERT INTO registeredSecurity (firstName, lastName, username, password) VALUES (%s, %s, %s, %s)"
+            values = (fNameField.get(), lNameField.get(), usernameField.get(), pwField.get())
+            cursor.execute(sqlCommand, values)
+            DB.commit()
+            messagebox.showinfo("Security Account Registration","Account Successfully Registered")
+            OpenSecurityLogInWindow()
+            secRegWin.destroy()
+        else:
+            messagebox.showinfo("Security Account Registration", "password and confirm password must be the same")
 
-    
     def fieldContentLogic(_var, _field):
         if _field == pwField:
             if _var.get() !="                             Password":
@@ -202,6 +208,10 @@ def OpenSecurityRegistration():
     def clearDB(): #temporary function
         cursor.execute('DELETE FROM registeredSecurity')
         DB.commit()
+    
+    def backToLogin():
+        secRegWin.destroy()
+        OpenSecurityLogInWindow()
 
     def varTrace(var, index, mode):
         fieldContentLogic(pwVar,pwField)
@@ -270,6 +280,9 @@ def OpenSecurityRegistration():
 
     clearDBbutton= Button(secRegWin, text="clear DB", bg="yellow" ,font=("Microsoft YaHei UI Light",10,"bold"),width=10, command = clearDB)
     clearDBbutton.place(relx= 0.85, rely=0.78)
+
+    backButton= Button(secRegWin, text="Go Back", bg="gray" ,font=("Microsoft YaHei UI Light",10,"bold"),width=10, command = backToLogin)
+    backButton.place(relx= 0.85, rely=0.88)
 
     secRegWin.protocol("WM_DELETE_WINDOW", lambda: releaseGrab(secRegWin))
     secRegWin.grab_set()
