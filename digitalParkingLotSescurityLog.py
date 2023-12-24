@@ -24,21 +24,34 @@ Database = mysql.connector.connect(
 cursorMain = Database.cursor()
 cursorMain.execute("CREATE DATABASE IF NOT EXISTS registeredParkingUsersDatabase")
 
+
 def checkUserToDatabase():
     sqlCommand = "SELECT * FROM registeredUsers WHERE studentNumber = %s" 
     scannedStdnNo = scanIDfield.get()
     stdnNumber = (scannedStdnNo, )
     cursorMain.execute(sqlCommand, stdnNumber)
     result = cursorMain.fetchone()
-
     #checker lang to. Trash this
     if result:
-        print("data exist")
+        sqlFName = "SELECT firstName FROM registeredUsers WHERE studentNumber = %s"
+        cursorMain.execute(sqlFName,stdnNumber)
+        resultFName = cursorMain.fetchone()
+        sqlLName = "SELECT lastName FROM registeredUsers WHERE studentNumber = %s"
+        cursorMain.execute(sqlLName, stdnNumber)
+        resultLName = cursorMain.fetchone()
+        firstName = resultFName[0]
+        lastName = resultLName[0]
+        resultName = firstName + " " + lastName
+        sqlDept = "SELECT department FROM registeredUsers WHERE studentNumber = %s"
+        cursorMain.execute(sqlDept, stdnNumber)
+        resultDept = cursorMain.fetchone()
+        
+        OpenParkingStatusWindow(resultName,str(resultDept))
     else: #data does not exist
         #open registration Window
         #put message box and additional ifelse logic here
         OpenParkingRegistrationWindow()
-        print("data doesnt exist")
+
 
 def dbquery(): #temporary function
     dataQuery = Tk()
@@ -57,6 +70,66 @@ def releaseGrab(_window):
     _window.grab_release()
     _window.destroy()
     scanWindow.destroy()
+
+def OpenParkingStatusWindow(_name,_dept):
+    parkStatWin = Toplevel(scanWindow)
+    parkStatWin.title("PNC Parking")
+    parkStatWin.geometry("800x450")
+    parkStatWin.iconbitmap("PNCLogo.ico")
+    parkStatWinCallImage=Image.open("parkingStatusWindowBG.png")
+    parkStatWinBackground=ImageTk.PhotoImage(parkStatWinCallImage)
+    parkStatWinBG=Label(parkStatWin,image=parkStatWinBackground)
+    parkStatWinBG.image = parkStatWinBackground
+    parkStatWinBG.grid(row=0, column=0)
+    parkStatWin.resizable(False,False)
+
+    #label
+    StudentInfo=Label(parkStatWin, text="Student Information",font=("berlinsans",20,"bold"),bg="darkgreen",width=47, height=2,)
+    StudentInfo.place(relx=0.001, rely=0.001,)
+
+    StudentName=Label(parkStatWin,text="Name:", font=("berlinsans",15),bg="lightgreen" ,width=8, height=1)
+    StudentName.place(relx=0.258,rely=0.25)
+
+    StudentNameFill=Label(parkStatWin,text=_name , font=("berlinsans",15),bg="lightgreen" ,width=30, height=1)
+    StudentNameFill.place(relx=0.35,rely=0.25)
+
+    StudentDepartment=Label(parkStatWin,text="Department:", font=("berlinsans",15),bg="lightgreen" ,width=12, height=1)
+    StudentDepartment.place(relx=0.258,rely=0.35)
+
+    StudentDepartmentFill=Label(parkStatWin,text=_dept, font=("berlinsans",15),bg="lightgreen" ,width=30, height=1)
+    StudentDepartmentFill.place(relx=0.43,rely=0.35)
+
+    StudentNo=Label(parkStatWin, text="Student No.",font=("berlinsans",15),bg="lightgreen" ,width=10, height=1)
+    StudentNo.place(relx=0.03, rely=0.52)
+
+    StudentNoFill=Label(parkStatWin, text="               ",font=("berlinsans",15),bg="lightgreen" ,width=20, height=1)
+    StudentNoFill.place(relx=0.17, rely=0.52)
+
+    RegisteredVehicle= Label(parkStatWin, text="Type of Vehicle:",font=("berlinsans",15),bg="lightgreen" ,width=13, height=1)
+    RegisteredVehicle.place(relx=0.03, rely=0.62)
+
+
+    RegisteredVehicleFill= Label(parkStatWin, text="        ",font=("berlinsans",15),bg="lightgreen" ,width=18, height=1)
+    RegisteredVehicleFill.place(relx=0.21, rely=0.62)
+
+    TimeIn=Label(parkStatWin, text="Time in:",font=("berlinsans",15),bg="gray" ,width=7, height=1)
+    TimeIn.place(relx=0.03,rely=0.75)
+
+    TimeOut=Label(parkStatWin, text="Time out:",font=("berlinsans",15),bg="gray" ,width=8, height=1)
+    TimeOut.place(relx=0.3,rely=0.75)
+
+    TimeInFill=Label(parkStatWin, text="              ",font=("berlinsans",15),bg="lightgreen" ,width=9, height=1)
+    TimeInFill.place(relx=0.03,rely=0.85)
+
+    TimeOutFill=Label(parkStatWin, text="              ",font=("berlinsans",15),bg="lightgreen" ,width=10, height=1)
+    TimeOutFill.place(relx=0.3,rely=0.85)
+
+    #button
+    PicHolder=Button(parkStatWin, text="PHOTO HERE", bg="white", width=20,height=8)
+    PicHolder.place(relx=0.03, rely=0.2)
+
+    DoneButton=Button(parkStatWin, text="Done", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=12)
+    DoneButton.place(relx=0.48,rely=0.9)
 
 def OpenSecurityLogInWindow():
     securityLogInWindow = Toplevel(scanWindow)
@@ -239,7 +312,6 @@ def OpenSecurityRegistration():
     fNameField.insert(0,"First Name")
     fNameField.bind("<Button-1>",fNameClearOnClick)
 
-
     lNameField= Entry(secRegWin, width=20, fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light",9))
     lNameField.place(relx=0.485, rely=0.35)
     lNameField.insert(0,"Last Name")
@@ -314,7 +386,6 @@ def OpenParkingRegistrationWindow():
         studentNumber INT(20), \
         department VARCHAR(255), \
         vehicleType VARCHAR(255))")
-
     '''
         idagdag to kapag na-code na ung file handling for pictures
         userPhoto VARCHAR(255), \ # gumamit ng VARCHAR kasi ififile handle ung name ng image file
