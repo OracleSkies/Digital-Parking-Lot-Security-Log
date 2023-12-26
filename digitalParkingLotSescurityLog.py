@@ -35,8 +35,8 @@ def checkUserToDatabase():
     sqlCommand = "SELECT * FROM registeredUsers WHERE studentNumber = %s" 
     scannedStdnNo = scanIDfield.get()
     stdnNumber = (scannedStdnNo, )
-    cursorMain.execute(sqlCommand, stdnNumber)
-    result = cursorMain.fetchone()
+    cursor.execute(sqlCommand, stdnNumber)
+    result = cursor.fetchone()
     #checker lang to. Trash this
     if result:
         sqlFName = "SELECT firstName FROM registeredUsers WHERE studentNumber = %s"
@@ -479,7 +479,7 @@ def OpenParkingRegistrationWindow():
     deptOptionsDrpDwn.current(0)
     deptOptionsDrpDwn.place(relx=0.4, rely=0.525, width=305)
 
-    vehicleOptionsDrpDwn = ttk.Combobox(parkRegWin, value = ["Select Type of Vehicle","Bike", "E-Bike", "Motorcycle"," Car"])
+    vehicleOptionsDrpDwn = ttk.Combobox(parkRegWin, value = ["Select Type of Vehicle","Bike", "E-Bike", "Motorcycle", "Car",])
     vehicleOptionsDrpDwn.current(0)
     vehicleOptionsDrpDwn.place(relx=0.4,rely=0.672)
 
