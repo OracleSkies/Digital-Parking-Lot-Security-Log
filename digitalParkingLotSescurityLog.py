@@ -24,6 +24,15 @@ Database = mysql.connector.connect(
 cursorMain = Database.cursor()
 cursorMain.execute("CREATE DATABASE IF NOT EXISTS registeredParkingUsersDatabase")
 
+actualParkDB = mysql.connector.connect(
+    host = 'localhost',
+    user = 'root',
+    passwd = 'password123',
+)
+cursorActual = actualParkDB.cursor()
+cursorActual.execute("CREATE DATABASE IF NOT EXISTS actualParkedDatabase")
+
+
 def checkUserToDatabase():
     DB = mysql.connector.connect(
         host = 'localhost',
@@ -32,6 +41,29 @@ def checkUserToDatabase():
         database = 'registeredParkingUsersDatabase',
     )
     cursor = DB.cursor()
+
+    actualDB = mysql.connector.connect(
+        host = 'localhost',
+        user = 'root',
+        passwd = 'password123',
+        database = 'actualParkedDatabase',
+    )
+    cursor.execute("CREATE TABLE IF NOT EXISTS parkedUsers (\
+        userID INT AUTO_INCREMENT PRIMARY KEY,\
+        firstName VARCHAR(255), \
+        lastName VARCHAR(255), \
+        studentNumber INT(20), \
+        department VARCHAR(255), \
+        vehicleType VARCHAR(255), \
+        timeIn VARCHAR(255), \
+        timeOut VARCHAR(255))")
+        
+    '''
+        idagdag to kapag na-code na ung file handling for pictures
+        userPhoto VARCHAR(255), \ # gumamit ng VARCHAR kasi ififile handle ung name ng image file
+        vechiclePhoto VARCHAR(255)\
+'''
+
     sqlCommand = "SELECT * FROM registeredUsers WHERE studentNumber = %s" 
     scannedStdnNo = scanIDfield.get()
     stdnNumber = (scannedStdnNo, )
@@ -55,9 +87,10 @@ def checkUserToDatabase():
         cursor.execute(sqlTOV, stdnNumber)
         resultTOV = cursor.fetchone()
         OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV)
+
     else: #data does not exist
         #open registration Window
-        #put message box and additional ifelse logic here
+        #put message box and additional ifelse logic here if go to register or scan another
         OpenParkingRegistrationWindow()
 
 def dbquery(): #temporary function
@@ -290,6 +323,7 @@ def OpenSecurityRegistration():
     
     def clearDB(): #temporary function
         cursor.execute('DELETE FROM registeredSecurity')
+        cursor.execute('ALTER TABLE registeredSecurity AUTO_INCREMENT = 0')
         DB.commit()
     
     def backToLogin():
@@ -439,6 +473,7 @@ def OpenParkingRegistrationWindow():
 
     def clearDB(): #temporary function
         cursor.execute('DELETE FROM registeredUsers')
+        cursor.execute('ALTER TABLE registeredUsers AUTO_INCREMENT = 0')
         DB.commit()
 
     def fNameClearOnClick(event):
