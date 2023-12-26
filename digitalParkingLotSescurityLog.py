@@ -1,8 +1,14 @@
 from tkinter import *
 from tkinter import ttk, messagebox
 from PIL import ImageTk,Image
+from datetime import datetime
 import mysql.connector
 import csv
+
+'''
+=== TASKS === 
+compile all tables in one database
+'''
 
 #scanWindow is root
 scanWindow = Tk()
@@ -14,6 +20,9 @@ scanWindowBackEnd=ImageTk.PhotoImage(scanWindowCallImage)
 scanWindowBG=Label(scanWindow,image=scanWindowBackEnd)
 scanWindowBG.grid(row=0, column=0)
 scanWindow.resizable(False,False)
+time = datetime.now()
+timeNow = time.strftime("%H:%M")
+dateNow = time.strftime("%b %d, %Y")
 
 Database = mysql.connector.connect(
     host = 'localhost',
@@ -32,7 +41,6 @@ actualParkDB = mysql.connector.connect(
 cursorActual = actualParkDB.cursor()
 cursorActual.execute("CREATE DATABASE IF NOT EXISTS actualParkedDatabase")
 
-
 def checkUserToDatabase():
     DB = mysql.connector.connect(
         host = 'localhost',
@@ -48,21 +56,31 @@ def checkUserToDatabase():
         passwd = 'password123',
         database = 'actualParkedDatabase',
     )
-    cursor.execute("CREATE TABLE IF NOT EXISTS parkedUsers (\
+    actualCursor = actualDB.cursor()
+    actualCursor.execute("CREATE TABLE IF NOT EXISTS parkedUsers (\
         userID INT AUTO_INCREMENT PRIMARY KEY,\
         firstName VARCHAR(255), \
         lastName VARCHAR(255), \
         studentNumber INT(20), \
         department VARCHAR(255), \
         vehicleType VARCHAR(255), \
+        date VARCHAR(255),\
         timeIn VARCHAR(255), \
         timeOut VARCHAR(255))")
-        
     '''
         idagdag to kapag na-code na ung file handling for pictures
         userPhoto VARCHAR(255), \ # gumamit ng VARCHAR kasi ififile handle ung name ng image file
         vechiclePhoto VARCHAR(255)\
 '''
+
+    def parkLog():
+
+        sqlCommand = "INSERT INTO parkedUsers (firstName, lastName, studentNumber, department, vehicleType, date, timeIn) VALUES (%s, %s, %s, %s, %s, %s ,%s)"
+        values = (fNameField.get(), lNameField.get(), StudentNoField.get(), deptOptionsDrpDwn.get(), vehicleOptionsDrpDwn.get(), )
+        cursor.execute(sqlCommand, values)
+        DB.commit()
+        #messagebox.showinfo("Parking registration", "Registration Sucessful")
+        #parkRegWin.destroy()
 
     sqlCommand = "SELECT * FROM registeredUsers WHERE studentNumber = %s" 
     scannedStdnNo = scanIDfield.get()
@@ -86,7 +104,26 @@ def checkUserToDatabase():
         sqlTOV = "SELECT vehicleType FROM registeredUsers WHERE studentNumber = %s"
         cursor.execute(sqlTOV, stdnNumber)
         resultTOV = cursor.fetchone()
+        sqlCommand2 = "INSERT INTO parkedUsers (firstName, lastName, studentNumber, department, vehicleType, date, timeIn) VALUES (%s, %s, %s, %s, %s, %s ,%s)"
+        values = (str(resultFName[0]), str(resultLName[0]), int(stdnNumber[0]), str(resultDept[0]), str(resultTOV[0]), dateNow, timeNow)
+        actualCursor.execute(sqlCommand2,values)
+        actualDB.commit()
         OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV)
+
+        def dbquery(): #temporary function
+            dataQuery = Tk()
+            dataQuery.title("registered Query")
+            dataQuery.geometry('800x600')
+            actualCursor.execute("SELECT * FROM parkedUsers")
+            result = actualCursor.fetchall()
+            for index, tableRow in enumerate(result):
+                num = 0
+                for tableColumn in tableRow:
+                    dataQueryLabel = Label(dataQuery,text=tableColumn) 
+                    dataQueryLabel.grid(row=index, column=num, padx=5)
+                    num += 1
+        
+        dbquery() #temporary
 
     else: #data does not exist
         #open registration Window
@@ -161,10 +198,10 @@ def OpenParkingStatusWindow(_name,_dept,_stdNum,_TOV):
     TimeOut=Label(parkStatWin, text="Time out:",font=("berlinsans",15),bg="gray" ,width=8, height=1)
     TimeOut.place(relx=0.3,rely=0.75)
 
-    TimeInFill=Label(parkStatWin, text="              ",font=("berlinsans",15),bg="lightgreen" ,width=9, height=1)
+    TimeInFill=Label(parkStatWin, text=timeNow,font=("berlinsans",15),bg="lightgreen" ,width=9, height=1)
     TimeInFill.place(relx=0.03,rely=0.85)
 
-    TimeOutFill=Label(parkStatWin, text="              ",font=("berlinsans",15),bg="lightgreen" ,width=10, height=1)
+    TimeOutFill=Label(parkStatWin, text=timeNow,font=("berlinsans",15),bg="lightgreen" ,width=10, height=1)
     TimeOutFill.place(relx=0.3,rely=0.85)
 
     #button
