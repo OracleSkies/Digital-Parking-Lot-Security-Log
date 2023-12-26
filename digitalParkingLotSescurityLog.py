@@ -73,15 +73,6 @@ def checkUserToDatabase():
         vechiclePhoto VARCHAR(255)\
 '''
 
-    def parkLog():
-
-        sqlCommand = "INSERT INTO parkedUsers (firstName, lastName, studentNumber, department, vehicleType, date, timeIn) VALUES (%s, %s, %s, %s, %s, %s ,%s)"
-        values = (fNameField.get(), lNameField.get(), StudentNoField.get(), deptOptionsDrpDwn.get(), vehicleOptionsDrpDwn.get(), )
-        cursor.execute(sqlCommand, values)
-        DB.commit()
-        #messagebox.showinfo("Parking registration", "Registration Sucessful")
-        #parkRegWin.destroy()
-
     sqlCommand = "SELECT * FROM registeredUsers WHERE studentNumber = %s" 
     scannedStdnNo = scanIDfield.get()
     stdnNumber = (scannedStdnNo, )
