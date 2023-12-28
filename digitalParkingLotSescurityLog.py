@@ -32,6 +32,15 @@ Database = mysql.connector.connect(
 cursorMain = Database.cursor()
 cursorMain.execute("CREATE DATABASE IF NOT EXISTS digitalParkingLotSecurityLogDatabase")
 
+dbase = mysql.connector.connect(
+    host = 'localhost',
+    user = 'root',
+    passwd = 'password123',
+    database = 'digitalParkingLotSecurityLogDatabase',
+)
+cursorDbase = dbase.cursor()
+
+
 def checkUserToDatabase():
     DB = mysql.connector.connect(
         host = 'localhost',
@@ -116,8 +125,8 @@ def dbquery(): #temporary function
     dataQuery = Tk()
     dataQuery.title("registered Query")
     dataQuery.geometry('800x600')
-    cursorMain.execute("SELECT * FROM registeredUsers")
-    result = cursorMain.fetchall()
+    cursorDbase.execute("SELECT * FROM registeredUsers")
+    result = cursorDbase.fetchall()
     for index, tableRow in enumerate(result):
         num = 0
         for tableColumn in tableRow:
