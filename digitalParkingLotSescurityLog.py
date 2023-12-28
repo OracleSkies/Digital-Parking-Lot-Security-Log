@@ -28,36 +28,27 @@ Database = mysql.connector.connect(
     host = 'localhost',
     user = 'root',
     passwd = 'password123',
-    database = 'registeredParkingUsersDatabase',
 )
 cursorMain = Database.cursor()
-cursorMain.execute("CREATE DATABASE IF NOT EXISTS registeredParkingUsersDatabase")
-
-actualParkDB = mysql.connector.connect(
-    host = 'localhost',
-    user = 'root',
-    passwd = 'password123',
-)
-cursorActual = actualParkDB.cursor()
-cursorActual.execute("CREATE DATABASE IF NOT EXISTS actualParkedDatabase")
+cursorMain.execute("CREATE DATABASE IF NOT EXISTS digitalParkingLotSecurityLogDatabase")
 
 def checkUserToDatabase():
     DB = mysql.connector.connect(
         host = 'localhost',
         user = 'root',
         passwd = 'password123',
-        database = 'registeredParkingUsersDatabase',
+        database = 'digitalParkingLotSecurityLogDatabase',
     )
     cursor = DB.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS registeredUsers (\
+        userID INT AUTO_INCREMENT PRIMARY KEY,\
+        firstName VARCHAR(255), \
+        lastName VARCHAR(255), \
+        studentNumber INT(20), \
+        department VARCHAR(255), \
+        vehicleType VARCHAR(255))")
 
-    actualDB = mysql.connector.connect(
-        host = 'localhost',
-        user = 'root',
-        passwd = 'password123',
-        database = 'actualParkedDatabase',
-    )
-    actualCursor = actualDB.cursor()
-    actualCursor.execute("CREATE TABLE IF NOT EXISTS parkedUsers (\
+    cursor.execute("CREATE TABLE IF NOT EXISTS parkedUsers (\
         userID INT AUTO_INCREMENT PRIMARY KEY,\
         firstName VARCHAR(255), \
         lastName VARCHAR(255), \
@@ -71,7 +62,7 @@ def checkUserToDatabase():
         idagdag to kapag na-code na ung file handling for pictures
         userPhoto VARCHAR(255), \ # gumamit ng VARCHAR kasi ififile handle ung name ng image file
         vechiclePhoto VARCHAR(255)\
-'''
+    '''
 
     sqlCommand = "SELECT * FROM registeredUsers WHERE studentNumber = %s" 
     scannedStdnNo = scanIDfield.get()
@@ -97,16 +88,16 @@ def checkUserToDatabase():
         resultTOV = cursor.fetchone()
         sqlCommand2 = "INSERT INTO parkedUsers (firstName, lastName, studentNumber, department, vehicleType, date, timeIn) VALUES (%s, %s, %s, %s, %s, %s ,%s)"
         values = (str(resultFName[0]), str(resultLName[0]), int(stdnNumber[0]), str(resultDept[0]), str(resultTOV[0]), dateNow, timeNow)
-        actualCursor.execute(sqlCommand2,values)
-        actualDB.commit()
+        cursor.execute(sqlCommand2,values)
+        DB.commit()
         OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV)
 
         def dbquery(): #temporary function
             dataQuery = Tk()
             dataQuery.title("registered Query")
             dataQuery.geometry('800x600')
-            actualCursor.execute("SELECT * FROM parkedUsers")
-            result = actualCursor.fetchall()
+            cursor.execute("SELECT * FROM parkedUsers")
+            result = cursor.fetchall()
             for index, tableRow in enumerate(result):
                 num = 0
                 for tableColumn in tableRow:
@@ -218,7 +209,7 @@ def OpenSecurityLogInWindow():
         host = 'localhost',
         user = 'root',
         passwd = 'password123',
-        database = 'sercurityAccountDatabase',
+        database = 'digitalParkingLotSecurityLogDatabase',
     )
 
     loginText= Label(securityLogInWindow, text="SECURITY LOG IN",font="berlinsans",bg="darkgreen",width=20, height=1,)
@@ -294,10 +285,9 @@ def OpenSecurityRegistration():
         host = 'localhost',
         user = 'root',
         passwd = 'password123',
-        database = 'sercurityAccountDatabase',
+        database = 'digitalParkingLotSecurityLogDatabase',
     )
     cursor = DB.cursor()
-    cursor.execute("CREATE DATABASE IF NOT EXISTS sercurityAccountDatabase")
     cursor.execute("CREATE TABLE IF NOT EXISTS registeredSecurity(\
         userID INT AUTO_INCREMENT PRIMARY KEY,\
         firstName VARCHAR(255),\
@@ -447,10 +437,9 @@ def OpenParkingRegistrationWindow():
         host = 'localhost',
         user = 'root',
         passwd = 'password123',
-        database = 'registeredParkingUsersDatabase',
+        database = 'digitalParkingLotSecurityLogDatabase',
     )
     cursor = DB.cursor()
-    cursor.execute("CREATE DATABASE IF NOT EXISTS registeredParkingUsersDatabase")
     cursor.execute("CREATE TABLE IF NOT EXISTS registeredUsers (\
         userID INT AUTO_INCREMENT PRIMARY KEY,\
         firstName VARCHAR(255), \
@@ -465,7 +454,6 @@ def OpenParkingRegistrationWindow():
         '''
     
     def registerUser():
-        cursor.execute("CREATE DATABASE IF NOT EXISTS registeredParkingUsersDatabase")
         #table
         cursor.execute("CREATE TABLE IF NOT EXISTS registeredUsers (\
         userID INT AUTO_INCREMENT PRIMARY KEY,\
