@@ -475,8 +475,6 @@ def OpenSecurityRegistration():
     backButton= Button(secRegWin, text="Go Back", bg="gray" ,font=("Microsoft YaHei UI Light",10,"bold"),width=10, command = backToLogin)
     backButton.place(relx= 0.85, rely=0.88)
 
-    secRegWin.protocol("WM_DELETE_WINDOW", lambda: releaseGrab(secRegWin))
-    secRegWin.grab_set()
 
 def OpenParkingRegistrationWindow():
     parkRegWin = Toplevel(homeWindow)
@@ -583,7 +581,7 @@ def OpenParkingRegistrationWindow():
     StudentNoField.bind("<Button-1>",studentNoClearOnClick)
 
     #Combo Boxes
-    deptOptionsDrpDwn = ttk.Combobox(parkRegWin, value = ["Select Department","College of Engineering", "College of Education", "College of Arts and Sciences", "College of Allied Health and Sciences", "College of Business Administration and Accountancy", "College of Computing Studies"])
+    deptOptionsDrpDwn = ttk.Combobox(parkRegWin, value = ["Select Department","COE", "COED", "CAS", "CHAS", "CBAA", "CCS"])
     deptOptionsDrpDwn.current(0)
     deptOptionsDrpDwn.place(relx=0.4, rely=0.525, width=305)
 
@@ -624,24 +622,24 @@ scIDButton= Button(homeWindow, text="Scanned    ID", bg="#f8faf7" ,font=("Segoe"
 scIDButton.place(relx=0.000,rely=0.4)
 
 #ScRegButton
-ScRegButton= Button(homeWindow, text="Security    Registration", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3)
+ScRegButton= Button(homeWindow, text="Security    Registration", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenSecurityRegistration)
 ScRegButton.place(relx=0.000,rely=0.5)
 
 #STRegButton
-STRegButton= Button(homeWindow, text="Student    Registration", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3)
+STRegButton= Button(homeWindow, text="Student    Registration", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenParkingRegistrationWindow)
 STRegButton.place(relx=0.000,rely=0.6)
 
 #DateLabel
 DayLabel= Label(homeWindow,text=dayNow, bg="#ccd6dd", font=("Segoe",50,"italic","bold"), width=2, height=1)
 DayLabel.place(relx=0.76,rely=0.1975)
 
-MonthLabel= Label(homeWindow,text=monthNow, bg="#ccd6dd", font=("Segoe",20,"italic"), width=10, height=1, sticky = W)
+MonthLabel= Label(homeWindow,text=monthNow, bg="#ccd6dd", font=("Segoe",20,"italic"), width=8, height=1)
 MonthLabel.place(relx=0.82,rely=0.18)
 
-YearLabel= Label(homeWindow,text=yearNow, bg="#ccd6dd", font=("Segoe",20,"italic"), width=4, height=1,sticky = W)
+YearLabel= Label(homeWindow,text=yearNow, bg="#ccd6dd", font=("Segoe",20,"italic"), width=4, height=1)
 YearLabel.place(relx=0.82,rely=0.22)
 
-TimeLabel= Label(homeWindow, fg="darkgreen",bg="#ccd6dd", font=("Segoe",20,"italic"), width=10, height=1,sticky = W)
+TimeLabel= Label(homeWindow, fg="darkgreen",bg="#ccd6dd", font=("Segoe",20,"italic"), width=10, height=1)
 TimeLabel.place(relx=0.82,rely=0.26)
 
 #fullNameLabel
