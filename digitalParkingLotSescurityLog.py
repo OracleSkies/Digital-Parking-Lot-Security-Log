@@ -5,17 +5,6 @@ from datetime import datetime
 import mysql.connector
 import csv
 
-'''
-scanWindow = Tk()
-scanWindow.title("PNC Parking Scan")
-scanWindow.geometry("400x314")
-scanWindow.iconbitmap("PNCLogo.ico")
-scanWindowCallImage=Image.open("scanWindowBGupdated.png")
-scanWindowBackEnd=ImageTk.PhotoImage(scanWindowCallImage)
-scanWindowBG=Label(scanWindow,image=scanWindowBackEnd)
-scanWindowBG.grid(row=0, column=0)
-scanWindow.resizable(False,False)
-'''
 homeWindow = Tk()
 homeWindow.title("PNC Parking")
 homeWindow.geometry("1440x810")
@@ -29,8 +18,11 @@ homeWindow.resizable(False,False)
 
 time = datetime.now()
 timeNow = time.strftime("%H:%M")
-timeNow12hr = time.strftime("%I:%M %p")
+fullTimeNow = time.strftime("%I:%M:%S %p")
 dateNow = time.strftime("%b %d, %Y")
+dayNow = time.strftime("%d")
+monthNow = time.strftime("%B")
+yearNow = time.strftime("%Y")
 
 Database = mysql.connector.connect(
     host = 'localhost',
@@ -48,87 +40,6 @@ dbase = mysql.connector.connect(
 )
 cursorDbase = dbase.cursor()
 
-
-def checkUserToDatabase():
-    DB = mysql.connector.connect(
-        host = 'localhost',
-        user = 'root',
-        passwd = 'password123',
-        database = 'digitalParkingLotSecurityLogDatabase',
-    )
-    cursor = DB.cursor()
-    cursor.execute("CREATE TABLE IF NOT EXISTS registeredUsers (\
-        userID INT AUTO_INCREMENT PRIMARY KEY,\
-        firstName VARCHAR(255), \
-        lastName VARCHAR(255), \
-        studentNumber INT(20), \
-        department VARCHAR(255), \
-        vehicleType VARCHAR(255))")
-
-    cursor.execute("CREATE TABLE IF NOT EXISTS parkedUsers (\
-        userID INT AUTO_INCREMENT PRIMARY KEY,\
-        firstName VARCHAR(255), \
-        lastName VARCHAR(255), \
-        studentNumber INT(20), \
-        department VARCHAR(255), \
-        vehicleType VARCHAR(255), \
-        date VARCHAR(255),\
-        timeIn VARCHAR(255), \
-        timeOut VARCHAR(255))")
-    '''
-        idagdag to kapag na-code na ung file handling for pictures
-        userPhoto VARCHAR(255), \ # gumamit ng VARCHAR kasi ififile handle ung name ng image file
-        vechiclePhoto VARCHAR(255)\
-    '''
-
-    sqlCommand = "SELECT * FROM registeredUsers WHERE studentNumber = %s" 
-    scannedStdnNo = scanIDfield.get()
-    stdnNumber = (scannedStdnNo, )
-    cursor.execute(sqlCommand, stdnNumber)
-    result = cursor.fetchone()
-    #checker lang to. Trash this
-    if result:
-        sqlFName = "SELECT firstName FROM registeredUsers WHERE studentNumber = %s"
-        cursor.execute(sqlFName,stdnNumber)
-        resultFName = cursor.fetchone()
-        sqlLName = "SELECT lastName FROM registeredUsers WHERE studentNumber = %s"
-        cursor.execute(sqlLName, stdnNumber)
-        resultLName = cursor.fetchone()
-        firstName = resultFName[0]
-        lastName = resultLName[0]
-        resultName = firstName + " " + lastName
-        sqlDept = "SELECT department FROM registeredUsers WHERE studentNumber = %s"
-        cursor.execute(sqlDept, stdnNumber)
-        resultDept = cursor.fetchone()
-        sqlTOV = "SELECT vehicleType FROM registeredUsers WHERE studentNumber = %s"
-        cursor.execute(sqlTOV, stdnNumber)
-        resultTOV = cursor.fetchone()
-        sqlCommand2 = "INSERT INTO parkedUsers (firstName, lastName, studentNumber, department, vehicleType, date, timeIn) VALUES (%s, %s, %s, %s, %s, %s ,%s)"
-        values = (str(resultFName[0]), str(resultLName[0]), int(stdnNumber[0]), str(resultDept[0]), str(resultTOV[0]), dateNow, timeNow)
-        cursor.execute(sqlCommand2,values)
-        DB.commit()
-        OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV)
-
-        def dbquery(): #temporary function
-            dataQuery = Tk()
-            dataQuery.title("registered Query")
-            dataQuery.geometry('800x600')
-            cursor.execute("SELECT * FROM parkedUsers")
-            result = cursor.fetchall()
-            for index, tableRow in enumerate(result):
-                num = 0
-                for tableColumn in tableRow:
-                    dataQueryLabel = Label(dataQuery,text=tableColumn) 
-                    dataQueryLabel.grid(row=index, column=num, padx=5)
-                    num += 1
-        
-        dbquery() #temporary
-
-    else: #data does not exist
-        #open registration Window
-        #put message box and additional ifelse logic here if go to register or scan another
-        OpenParkingRegistrationWindow()
-
 def dbquery(): #temporary function
     dataQuery = Tk()
     dataQuery.title("registered Query")
@@ -141,7 +52,13 @@ def dbquery(): #temporary function
             dataQueryLabel = Label(dataQuery,text=tableColumn) 
             dataQueryLabel.grid(row=index, column=num, padx=5)
             num += 1
-    
+
+def updateClock():
+    rawTime = datetime.now()
+    updateTime = rawTime.strftime("%I:%M:%S %p")
+    TimeLabel.config(text = updateTime)
+    TimeLabel.after(1000,updateClock)
+
 def releaseGrab(_window):
     _window.grab_release()
     _window.destroy()
@@ -158,6 +75,12 @@ def OpenScanWindow():
     scanWindowBG.image = scanWindowBackEnd
     scanWindowBG.grid(row=0, column=0)
     scanWindow.resizable(False,False)
+    
+    def updateClock():
+        rawTime = datetime.now()
+        scanTime = rawTime.strftime("%I:%M %p")
+        DTholder.config(text = dateNow +" | " + scanTime)
+        DTholder.after(1000,updateClock)
 
     def checkUserToDatabase():
         DB = mysql.connector.connect(
@@ -239,7 +162,7 @@ def OpenScanWindow():
             #put message box and additional ifelse logic here if go to register or scan another
             OpenParkingRegistrationWindow()
 
-    DTholder= Label(scanWindow,text= dateNow +" | " + timeNow12hr, font=("Segoe",10),bg="#f8faf7", width=25, height=1)
+    DTholder= Label(scanWindow,text= " ", font=("Segoe",10),bg="#f8faf7", width=25, height=1)
     DTholder.place(relx=0.53, rely=0.02)
 
     #label
@@ -261,7 +184,8 @@ def OpenScanWindow():
     #temporary button. trash this later
     queryButton= Button(scanWindow, text="query", bg="darkgreen" ,font=("Microsoft YaHei UI Light",8,"bold"),width=10, command=dbquery)
     queryButton.place(relx=0.4,rely=0.8)
-    return
+    
+    updateClock()
 
 def OpenParkingStatusWindow(_name,_dept,_stdNum,_TOV):
     parkStatWin = Toplevel(homeWindow)
@@ -707,48 +631,24 @@ ScRegButton.place(relx=0.000,rely=0.5)
 STRegButton= Button(homeWindow, text="Student    Registration", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3)
 STRegButton.place(relx=0.000,rely=0.6)
 
-
 #DateLabel
-DayLabel= Label(homeWindow,text="29", bg="#ccd6dd", font=("Segoe",50,"italic","bold"), width=2, height=1)
+DayLabel= Label(homeWindow,text=dayNow, bg="#ccd6dd", font=("Segoe",50,"italic","bold"), width=2, height=1)
 DayLabel.place(relx=0.76,rely=0.1975)
 
-MonthLabel= Label(homeWindow,text="DECEMBER", bg="#ccd6dd", font=("Segoe",20,"italic"), width=10, height=1)
+MonthLabel= Label(homeWindow,text=monthNow, bg="#ccd6dd", font=("Segoe",20,"italic"), width=10, height=1, sticky = W)
 MonthLabel.place(relx=0.82,rely=0.18)
 
-YearLabel= Label(homeWindow,text="2023", bg="#ccd6dd", font=("Segoe",20,"italic"), width=4, height=1)
+YearLabel= Label(homeWindow,text=yearNow, bg="#ccd6dd", font=("Segoe",20,"italic"), width=4, height=1,sticky = W)
 YearLabel.place(relx=0.82,rely=0.22)
 
-TimeLabel= Label(homeWindow,text="03:12:23 PM",fg="darkgreen",bg="#ccd6dd", font=("Segoe",20,"italic"), width=10, height=1)
+TimeLabel= Label(homeWindow, fg="darkgreen",bg="#ccd6dd", font=("Segoe",20,"italic"), width=10, height=1,sticky = W)
 TimeLabel.place(relx=0.82,rely=0.26)
 
 #fullNameLabel
 FNlabel=Label(homeWindow,text="SURNAME, First Name, MI.",fg="white", bg="#167237", font=("Segoe",25), width=25, height=1)
 FNlabel.place(relx=0.675, rely=0.025)
 
-'''
-DTholder= Label(scanWindow,text= dateNow +" | " + timeNow12hr, font=("Segoe",10),bg="#f8faf7", width=25, height=1)
-DTholder.place(relx=0.53, rely=0.02)
 
-#label
-ParkingLotScan= Label(scanWindow, text="Parking Lot Scanner",font="berlinsans",bg="darkgreen",width=21, height=1,)
-ParkingLotScan.place(relx=0.249, rely=0.35,)
-
-#text
-ScanID= Label(scanWindow,text="Scan ID", font="berlinsans", width=12, height=1)
-ScanID.place(relx=0.258,rely=0.47)
-
-#entry/field
-scanIDfield= Entry(scanWindow, width=20,border=2, bg="white")
-scanIDfield.place(relx=0.33,rely=0.54)
-
-#Button
-confirmButton= Button(scanWindow, text="Confirm", bg="darkgreen" ,font=("Microsoft YaHei UI Light",8,"bold"),width=10, command=checkUserToDatabase)
-confirmButton.place(relx=0.4,rely=0.7)
-
-#temporary button. trash this later
-queryButton= Button(scanWindow, text="query", bg="darkgreen" ,font=("Microsoft YaHei UI Light",8,"bold"),width=10, command=dbquery)
-queryButton.place(relx=0.4,rely=0.8)
-'''
-
+updateClock()
 OpenSecurityLogInWindow()
 homeWindow.mainloop()
