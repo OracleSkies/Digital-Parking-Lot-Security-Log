@@ -13,9 +13,9 @@ compile all tables in one database
 #scanWindow is root
 scanWindow = Tk()
 scanWindow.title("PNC Parking Scan")
-scanWindow.geometry("400x315")
+scanWindow.geometry("400x314")
 scanWindow.iconbitmap("PNCLogo.ico")
-scanWindowCallImage=Image.open("scanWindowBG.png")
+scanWindowCallImage=Image.open("scanWindowBGupdated.png")
 scanWindowBackEnd=ImageTk.PhotoImage(scanWindowCallImage)
 scanWindowBG=Label(scanWindow,image=scanWindowBackEnd)
 scanWindowBG.grid(row=0, column=0)
@@ -138,6 +138,9 @@ def releaseGrab(_window):
     _window.grab_release()
     _window.destroy()
     scanWindow.destroy()
+
+def OpenScanWindow():
+    return
 
 def OpenParkingStatusWindow(_name,_dept,_stdNum,_TOV):
     parkStatWin = Toplevel(scanWindow)
@@ -563,9 +566,12 @@ def OpenParkingRegistrationWindow():
     cleardb_button = Button(parkRegWin, text="Clear database", bg="yellow" ,font=("Microsoft YaHei UI Light",10,"bold"),width=12, command=clearDB)
     cleardb_button.place(relx= 0.65, rely=0.75)
 
+DTholder= Label(scanWindow,text="January 1, 2023 | 10:30 AM", font=("Segoe",10),bg="#f8faf7", width=25, height=1)
+DTholder.place(relx=0.53, rely=0.02)
+
 #label
-ParkingLotScan= Label(scanWindow, text="Parking Lot Scanner",font="berlinsans",bg="darkgreen",width=20, height=1,)
-ParkingLotScan.place(relx=0.27, rely=0.32,)
+ParkingLotScan= Label(scanWindow, text="Parking Lot Scanner",font="berlinsans",bg="darkgreen",width=21, height=1,)
+ParkingLotScan.place(relx=0.249, rely=0.35,)
 
 #text
 ScanID= Label(scanWindow,text="Scan ID", font="berlinsans", width=12, height=1)
