@@ -380,28 +380,6 @@ def OpenSecurityRegistration():
             else:
                 _field.config(show="")
 
-    def dbquery(): #temporary function
-        dataQuery = Tk()
-        dataQuery.title("Security account Query")
-        dataQuery.geometry('800x600')
-        cursor.execute("SELECT * FROM registeredSecurity")
-        result = cursor.fetchall()
-        for index, tableRow in enumerate(result):
-            num = 0
-            for tableColumn in tableRow:
-                dataQueryLabel = Label(dataQuery,text=tableColumn) 
-                # add index to x to get the specific field u want (eg x[0] would give you the 0th column of the database which is the first name) 
-                dataQueryLabel.grid(row=index, column=num, padx=5)
-                num += 1
-    
-    def clearDB(): #temporary function
-        cursor.execute('DELETE FROM registeredSecurity')
-        cursor.execute('ALTER TABLE registeredSecurity AUTO_INCREMENT = 0')
-        DB.commit()
-    
-    def backToLogin():
-        secRegWin.destroy()
-
     def varTrace(var, index, mode):
         fieldContentLogic(pwVar,pwField)
         fieldContentLogic(confirmVar,confirmPwField)
@@ -454,24 +432,12 @@ def OpenSecurityRegistration():
     confirmPwField.bind("<Button-1>",confirmClearOnClick)
 
     #buttons
-    '''
-    PicHolder=Button(secRegWin, text="PHOTO HERE", bg="white", width=15,height=6)
-    PicHolder.place(relx=0.3, rely=0.63)
-    '''
     UploadButton= Button(secRegWin,text="Upload photo", bg="white", width=15, command = uploadPhoto)
     UploadButton.place(relx=0.49,rely=0.67)
 
     Reg_button= Button(secRegWin, text="Register", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command = registerSecurity)
     Reg_button.place(relx= 0.46, rely=0.78)
 
-    querybutton= Button(secRegWin, text="Query", bg="yellow" ,font=("Microsoft YaHei UI Light",10,"bold"),width=10, command = dbquery)
-    querybutton.place(relx= 0.7, rely=0.78)
-
-    clearDBbutton= Button(secRegWin, text="clear DB", bg="yellow" ,font=("Microsoft YaHei UI Light",10,"bold"),width=10, command = clearDB)
-    clearDBbutton.place(relx= 0.85, rely=0.78)
-
-    backButton= Button(secRegWin, text="Go Back", bg="gray" ,font=("Microsoft YaHei UI Light",10,"bold"),width=10, command = backToLogin)
-    backButton.place(relx= 0.85, rely=0.88)
 
 def OpenParkingRegistrationWindow():
     parkRegWin = Toplevel(homeWindow)
@@ -622,7 +588,6 @@ def OpenExportWindow():
 
     RegScButton=Button(exportWindow, text="Registered Security", font=("Segoe",20),width=30,height=1)
     RegScButton.place(relx=0.249, rely=0.6)
-
 
 #label
 ScanID= Label(homeWindow,text="Security Scanner Home Page", bg="gray", font=("Segoe",15), width=24, height=3)
