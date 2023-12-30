@@ -1,6 +1,7 @@
 from tkinter import*
 from PIL import ImageTk, Image
 import mysql.connector
+import io
 
 '''
 === SCRIPT TASK===
@@ -19,6 +20,14 @@ lbl=Label(root,image=bck_end)
 lbl.grid(row=0, column=0)
 root.resizable(False,False)
 
+database = mysql.connector.connect(
+    host = 'localhost',
+    user = 'root',
+    passwd = 'password123',
+)
+cursorInit = database.cursor()
+cursorInit.execute("CREATE DATABASE IF NOT EXISTS sercurityAccountDatabase")
+
 #connect to database
 DB = mysql.connector.connect(
     host = 'localhost',
@@ -29,49 +38,62 @@ DB = mysql.connector.connect(
 #print(DB) #checks if connected sa database
 
 cursor = DB.cursor()
-cursor.execute("CREATE DATABASE IF NOT EXISTS sercurityAccountDatabase")
 
-'''
-cursor.execute('SHOW DATABASES')
-for db in cursor:
-    print(db)
-'''
 #create table
 
-cursor.execute("CREATE TABLE IF NOT EXISTS registeredSecurity(\
+cursor.execute("CREATE TABLE IF NOT EXISTS imagesTest(\
     userID INT AUTO_INCREMENT PRIMARY KEY,\
-    firstName VARCHAR(255),\
-    lastName VARCHAR(255),\
-    username VARCHAR(255),\
-    password VARCHAR(255))")
-'''
-idagdag to kapag nacode na ung file handling ng pictures
-userPhoto VARCHAR(255)
-'''
+    name VARCHAR(255),\
+    photoFile MEDIUMBLOB)")
+
 def registerSecurity():
+    with open(lNameField.get(),"rb") as file:
+        photo = file.read()
+    sqlCommand = "INSERT INTO imagesTest (name,photoFile) VALUES (%s, %s)"
+    values = (fNameField.get(),photo)
+    cursor.execute(sqlCommand,values)
+    DB.commit()
+
+    '''
     sqlCommand = "INSERT INTO registeredSecurity (firstName, lastName, username, password) VALUES (%s, %s, %s, %s)"
     values = (fNameField.get(), lNameField.get(), usernameField.get(), pwField.get())
     cursor.execute(sqlCommand, values)
     DB.commit()
+    '''
 
 def dbquery(): #this function is temporary. This just shows all data in the table
-    dataQuery = Tk()
-    dataQuery.title("Data Query")
-    dataQuery.geometry('800x600')
-    cursor.execute("SELECT * FROM registeredSecurity")
-    result = cursor.fetchall()
-    for index, tableRow in enumerate(result):
-        num = 0
-        for tableColumn in tableRow:
-            dataQueryLabel = Label(dataQuery,text=tableColumn) 
-            # add index to x to get the specific field u want (eg x[0] would give you the 0th column of the database which is the first name) 
-            dataQueryLabel.grid(row=index, column=num, padx=5)
-            num += 1
+    
+    labelWindow = Toplevel(root)
+    labelWindow.title("DataQuery")
+    labelWindow.geometry("800x450")
+    labelWindow.resizable(False,False)
+
+    DB = mysql.connector.connect(
+        host = 'localhost',
+        user = 'root',
+        passwd = 'password123',
+        database = 'sercurityAccountDatabase'
+    )
+    cursor = DB.cursor()
+    sqlCommand = "SELECT photoFile FROM imagesTest WHERE userID = %s"
+    IDGet = usernameField.get()
+    ID = (IDGet,)
+    cursor.execute(sqlCommand, ID)
+    photo = cursor.fetchone()
+    resultPhoto = photo[0]
+    callPhoto = Image.open(io.BytesIO(resultPhoto))
+    newSize = (100, 100)
+    profilePic = callPhoto.resize(newSize)
+    
+    #labelWindowCallImage = Image.open(io.BytesIO(profilePic)) 
+    labelWindowBackground = ImageTk.PhotoImage(profilePic)
+    labelWindowBG = Label(labelWindow,image=labelWindowBackground)
+    labelWindowBG.image = labelWindowBackground
+    labelWindowBG.grid(row=0, column=0) 
 
 def varTrace(var, index, mode):
     fieldContentLogic(pwVar,pwField)
     fieldContentLogic(confirmVar,confirmPwField)
-
 
 def fieldContentLogic(_var,_field):
     if _field == pwField:
@@ -103,13 +125,11 @@ def clearDB(): #temporary function
 loginText= Label(root, text="Security Registration",font="berlinsans",bg="darkgreen",width=30, height=1,)
 loginText.place(relx=0.31, rely=0.25,)
 
-
 #entry/fields
 fNameField= Entry(root, width=20,fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light", 9))
 fNameField.place(relx=0.3, rely=0.35)
 fNameField.insert(0,"First Name")
 fNameField.bind("<Button-1>",fNameClearOnClick)
-
 
 lNameField= Entry(root, width=20, fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light",9))
 lNameField.place(relx=0.485, rely=0.35)
