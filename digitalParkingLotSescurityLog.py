@@ -157,21 +157,6 @@ def OpenScanWindow():
             #display of info
             OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV, profilePic)
 
-            def dbquery(): #temporary function
-                dataQuery = Tk()
-                dataQuery.title("registered Query")
-                dataQuery.geometry('800x600')
-                cursor.execute("SELECT * FROM parkedUsers")
-                result = cursor.fetchall()
-                for index, tableRow in enumerate(result):
-                    num = 0
-                    for tableColumn in tableRow:
-                        dataQueryLabel = Label(dataQuery,text=tableColumn) 
-                        dataQueryLabel.grid(row=index, column=num, padx=5)
-                        num += 1
-            
-            #dbquery() #temporary
-
         else: #data does not exist
             #open registration Window
             #put message box and additional ifelse logic here if go to register or scan another
@@ -195,10 +180,6 @@ def OpenScanWindow():
     #Button
     confirmButton= Button(scanWindow, text="Confirm", bg="darkgreen" ,font=("Microsoft YaHei UI Light",8,"bold"),width=10, command=checkUserToDatabase)
     confirmButton.place(relx=0.4,rely=0.7)
-
-    #temporary button. trash this later
-    queryButton= Button(scanWindow, text="query", bg="darkgreen" ,font=("Microsoft YaHei UI Light",8,"bold"),width=10, command=dbquery)
-    queryButton.place(relx=0.4,rely=0.8)
     
     updateClock()
 
