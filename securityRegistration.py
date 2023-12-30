@@ -1,7 +1,9 @@
 from tkinter import*
+from tkinter import filedialog
 from PIL import ImageTk, Image
 import mysql.connector
 import io
+import os
 
 '''
 === SCRIPT TASK===
@@ -46,8 +48,12 @@ cursor.execute("CREATE TABLE IF NOT EXISTS imagesTest(\
     name VARCHAR(255),\
     photoFile MEDIUMBLOB)")
 
+currentFileName = "sdfsd"
+
 def registerSecurity():
-    with open(lNameField.get(),"rb") as file:
+    #inserting photo in database using the upload button that communicates with global variable "currentFileName"
+    #add ifelse logic if currentFileName is empty then reject
+    with open(currentFileName,"rb") as file:
         photo = file.read()
     sqlCommand = "INSERT INTO imagesTest (name,photoFile) VALUES (%s, %s)"
     values = (fNameField.get(),photo)
@@ -60,6 +66,25 @@ def registerSecurity():
     cursor.execute(sqlCommand, values)
     DB.commit()
     '''
+
+
+
+def uploadPhoto():
+    global currentFileName
+    #get the file name
+    filePath = filedialog.askopenfilename(title = "Select a file")
+    fileName = os.path.basename(filePath)
+    fileNameLabel.config(text = fileName)
+    currentFileName = fileName
+
+    #display pic in registration
+    displayPicCallImage = Image.open(fileName)
+    newSize = (110,110)
+    displayPicNewSize = displayPicCallImage.resize(newSize)
+    displayPic = ImageTk.PhotoImage(displayPicNewSize)
+    PicHolder = Label(root, image = displayPic, width=110,height=110)
+    PicHolder.place(relx=0.3, rely=0.63)
+    PicHolder.image = displayPic
 
 def dbquery(): #this function is temporary. This just shows all data in the table
     
@@ -74,6 +99,7 @@ def dbquery(): #this function is temporary. This just shows all data in the tabl
         passwd = 'password123',
         database = 'sercurityAccountDatabase'
     )
+
     cursor = DB.cursor()
     sqlCommand = "SELECT photoFile FROM imagesTest WHERE userID = %s"
     IDGet = usernameField.get()
@@ -82,14 +108,19 @@ def dbquery(): #this function is temporary. This just shows all data in the tabl
     photo = cursor.fetchone()
     resultPhoto = photo[0]
     callPhoto = Image.open(io.BytesIO(resultPhoto))
-    newSize = (100, 100)
+    newSize = (200, 200)
     profilePic = callPhoto.resize(newSize)
-    
     #labelWindowCallImage = Image.open(io.BytesIO(profilePic)) 
     labelWindowBackground = ImageTk.PhotoImage(profilePic)
     labelWindowBG = Label(labelWindow,image=labelWindowBackground)
     labelWindowBG.image = labelWindowBackground
     labelWindowBG.grid(row=0, column=0) 
+    sqlName = "SELECT name FROM imagesTest WHERE userID = %s"
+    cursor.execute(sqlName, ID)
+    name = cursor.fetchone()
+    nameResult = name[0]
+    nameLabel = Label(labelWindow, text = nameResult)
+    nameLabel.grid(row=1, column=0, padx=10, pady=10)
 
 def varTrace(var, index, mode):
     fieldContentLogic(pwVar,pwField)
@@ -125,6 +156,9 @@ def clearDB(): #temporary function
 loginText= Label(root, text="Security Registration",font="berlinsans",bg="darkgreen",width=30, height=1,)
 loginText.place(relx=0.31, rely=0.25,)
 
+fileNameLabel= Label(root, text=currentFileName,font="berlinsans",bg="darkgreen",width=30, height=1,)
+fileNameLabel.place(relx=0.31, rely=0.05,)
+
 #entry/fields
 fNameField= Entry(root, width=20,fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light", 9))
 fNameField.place(relx=0.3, rely=0.35)
@@ -157,10 +191,8 @@ confirmPwField.insert(0,"                        Confirm Password")
 confirmPwField.bind("<Button-1>",confirmClearOnClick)
 
 #buttons
-PicHolder=Button(root, text="PHOTO HERE", bg="white", width=15,height=6)
-PicHolder.place(relx=0.3, rely=0.63)
 
-UploadButton= Button(root,text="Upload photo", bg="white", width=15)
+UploadButton= Button(root,text="Upload photo", bg="white", width=15, command = uploadPhoto)
 UploadButton.place(relx=0.49,rely=0.67)
 
 Reg_button= Button(root, text="Register", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command = registerSecurity)
