@@ -1,7 +1,8 @@
 from tkinter import *
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, filedialog
 from PIL import ImageTk,Image
 from datetime import datetime
+import io
 import mysql.connector
 import csv
 
@@ -90,6 +91,7 @@ def OpenScanWindow():
             database = 'digitalParkingLotSecurityLogDatabase',
         )
         cursor = DB.cursor()
+        '''
         cursor.execute("CREATE TABLE IF NOT EXISTS registeredUsers (\
             userID INT AUTO_INCREMENT PRIMARY KEY,\
             firstName VARCHAR(255), \
@@ -97,7 +99,7 @@ def OpenScanWindow():
             studentNumber INT(20), \
             department VARCHAR(255), \
             vehicleType VARCHAR(255))")
-
+            '''
         cursor.execute("CREATE TABLE IF NOT EXISTS parkedUsers (\
             userID INT AUTO_INCREMENT PRIMARY KEY,\
             firstName VARCHAR(255), \
@@ -136,11 +138,24 @@ def OpenScanWindow():
             sqlTOV = "SELECT vehicleType FROM registeredUsers WHERE studentNumber = %s"
             cursor.execute(sqlTOV, stdnNumber)
             resultTOV = cursor.fetchone()
+
+            #for photos
+            sqlPhoto = "SELECT userPhoto FROM registeredUsers WHERE studentNumber = %s"
+            cursor.execute(sqlPhoto, stdnNumber)
+            resultPhoto = cursor.fetchone()
+            getPhoto = resultPhoto[0]
+            callPhoto = Image.open(io.BytesIO(getPhoto))
+            newSize = (150,150)
+            profilePicNewSize = callPhoto.resize(newSize)
+            profilePic = ImageTk.PhotoImage(profilePicNewSize)
+            #insertion to parkeduser table
             sqlCommand2 = "INSERT INTO parkedUsers (firstName, lastName, studentNumber, department, vehicleType, date, timeIn) VALUES (%s, %s, %s, %s, %s, %s ,%s)"
             values = (str(resultFName[0]), str(resultLName[0]), int(stdnNumber[0]), str(resultDept[0]), str(resultTOV[0]), dateNow, timeNow)
             cursor.execute(sqlCommand2,values)
             DB.commit()
-            OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV)
+
+            #display of info
+            OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV, profilePic)
 
             def dbquery(): #temporary function
                 dataQuery = Tk()
@@ -155,7 +170,7 @@ def OpenScanWindow():
                         dataQueryLabel.grid(row=index, column=num, padx=5)
                         num += 1
             
-            dbquery() #temporary
+            #dbquery() #temporary
 
         else: #data does not exist
             #open registration Window
@@ -187,7 +202,7 @@ def OpenScanWindow():
     
     updateClock()
 
-def OpenParkingStatusWindow(_name,_dept,_stdNum,_TOV):
+def OpenParkingStatusWindow(_name,_dept,_stdNum,_TOV,_photo):
     parkStatWin = Toplevel(homeWindow)
     parkStatWin.title("PNC Parking")
     parkStatWin.geometry("800x450")
@@ -227,7 +242,6 @@ def OpenParkingStatusWindow(_name,_dept,_stdNum,_TOV):
     RegisteredVehicle= Label(parkStatWin, text="Type of Vehicle:",font=("berlinsans",15),bg="lightgreen" ,width=13, height=1)
     RegisteredVehicle.place(relx=0.03, rely=0.62)
 
-
     RegisteredVehicleFill= Label(parkStatWin, text=_TOV,font=("berlinsans",15),bg="lightgreen" ,width=18, height=1)
     RegisteredVehicleFill.place(relx=0.21, rely=0.62)
 
@@ -243,10 +257,12 @@ def OpenParkingStatusWindow(_name,_dept,_stdNum,_TOV):
     TimeOutFill=Label(parkStatWin, text=timeNow,font=("berlinsans",15),bg="lightgreen" ,width=10, height=1)
     TimeOutFill.place(relx=0.3,rely=0.85)
 
+    #for picture
+    PicHolder=Label(parkStatWin, image = _photo)
+    PicHolder.image = _photo
+    PicHolder.place(relx=0.03, rely=0.16)
+    
     #button
-    PicHolder=Button(parkStatWin, text="PHOTO HERE", bg="white", width=20,height=8)
-    PicHolder.place(relx=0.03, rely=0.2)
-
     DoneButton=Button(parkStatWin, text="Done", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=12, command=parkStatWinDone)
     DoneButton.place(relx=0.48,rely=0.9)
 
@@ -475,7 +491,6 @@ def OpenSecurityRegistration():
     backButton= Button(secRegWin, text="Go Back", bg="gray" ,font=("Microsoft YaHei UI Light",10,"bold"),width=10, command = backToLogin)
     backButton.place(relx= 0.85, rely=0.88)
 
-
 def OpenParkingRegistrationWindow():
     parkRegWin = Toplevel(homeWindow)
     parkRegWin.title("PNC Parking Registration")
@@ -501,13 +516,14 @@ def OpenParkingRegistrationWindow():
         lastName VARCHAR(255), \
         studentNumber INT(20), \
         department VARCHAR(255), \
-        vehicleType VARCHAR(255))")
+        vehicleType VARCHAR(255),\
+        userPhoto MEDIUMBLOB)")
     '''
         idagdag to kapag na-code na ung file handling for pictures
         userPhoto VARCHAR(255), \ # gumamit ng VARCHAR kasi ififile handle ung name ng image file
         vechiclePhoto VARCHAR(255)\
         '''
-    
+    currentFileName = ""
     def registerUser():
         #table
         cursor.execute("CREATE TABLE IF NOT EXISTS registeredUsers (\
@@ -516,14 +532,32 @@ def OpenParkingRegistrationWindow():
         lastName VARCHAR(255), \
         studentNumber INT(20), \
         department VARCHAR(255), \
-        vehicleType VARCHAR(255))")
-
-        sqlCommand = "INSERT INTO registeredUsers (firstName, lastName, studentNumber, department, vehicleType) VALUES (%s, %s, %s, %s, %s)"
-        values = (fNameField.get(), lNameField.get(), StudentNoField.get(), deptOptionsDrpDwn.get(), vehicleOptionsDrpDwn.get())
+        vehicleType VARCHAR(255),\
+        userPhoto MEDIUMBLOB)")
+        #add if statement that checks if currentFileName is empty
+        with open(currentFileName,"rb") as file:
+            photo = file.read()
+        
+        sqlCommand = "INSERT INTO registeredUsers (firstName, lastName, studentNumber, department, vehicleType,userPhoto) VALUES (%s, %s, %s, %s, %s,%s)"
+        values = (fNameField.get(), lNameField.get(), StudentNoField.get(), deptOptionsDrpDwn.get(), vehicleOptionsDrpDwn.get(),photo)
         cursor.execute(sqlCommand, values)
         DB.commit()
         messagebox.showinfo("Parking registration", "Registration Sucessful")
         parkRegWin.destroy()
+    
+    def uploadPhoto():
+        nonlocal currentFileName
+        filePath = filedialog.askopenfilename(title = "Select an image")
+        #fileName = os.path.basename(filePath)
+        currentFileName = filePath
+        #display pic in registration
+        displayPicCallImage = Image.open(filePath)
+        newSize = (140,140)
+        displayPicNewSize = displayPicCallImage.resize(newSize)
+        displayPic = ImageTk.PhotoImage(displayPicNewSize)
+        PicHolder= Label(parkRegWin, image = displayPic, width=140,height=140)
+        PicHolder.place(relx=0.2, rely=0.3)
+        PicHolder.image = displayPic
 
     def goToScanWindow():
         parkRegWin.destroy()
@@ -590,11 +624,13 @@ def OpenParkingRegistrationWindow():
     vehicleOptionsDrpDwn.place(relx=0.4,rely=0.672)
 
     #Buttons
+    '''
     PicHolder= Button(parkRegWin, text="PHOTO HERE", bg="white", width=20,height=8)
     PicHolder.place(relx=0.2, rely=0.3)
+    '''
 
-    VehiclePDF= Button(parkRegWin, text="Upload Vehicle PDF", bg="white", width=20)
-    VehiclePDF.place(relx=0.6, rely=0.672)
+    uploadPhotoButton= Button(parkRegWin, text="Upload Photo", bg="white", width=20, command=uploadPhoto)
+    uploadPhotoButton.place(relx=0.6, rely=0.672)
 
     Reg_button = Button(parkRegWin, text="Register", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command=registerUser)
     Reg_button.place(relx= 0.4, rely=0.85)

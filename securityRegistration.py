@@ -74,11 +74,11 @@ def uploadPhoto():
     #get the file name
     filePath = filedialog.askopenfilename(title = "Select a file")
     fileName = os.path.basename(filePath)
-    fileNameLabel.config(text = fileName)
-    currentFileName = fileName
+    fileNameLabel.config(text = filePath)
+    currentFileName = filePath
 
     #display pic in registration
-    displayPicCallImage = Image.open(fileName)
+    displayPicCallImage = Image.open(filePath)
     newSize = (110,110)
     displayPicNewSize = displayPicCallImage.resize(newSize)
     displayPic = ImageTk.PhotoImage(displayPicNewSize)
