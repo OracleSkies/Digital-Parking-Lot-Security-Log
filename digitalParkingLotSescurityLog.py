@@ -399,7 +399,6 @@ def OpenSecurityRegistration():
     loginText= Label(secRegWin, text="Security Registration",font="berlinsans",bg="darkgreen",width=30, height=1,)
     loginText.place(relx=0.31, rely=0.25,)
 
-
     #entry/fields
     fNameField= Entry(secRegWin, width=20,fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light", 9))
     fNameField.place(relx=0.3, rely=0.35)
@@ -437,7 +436,6 @@ def OpenSecurityRegistration():
 
     Reg_button= Button(secRegWin, text="Register", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command = registerSecurity)
     Reg_button.place(relx= 0.46, rely=0.78)
-
 
 def OpenParkingRegistrationWindow():
     parkRegWin = Toplevel(homeWindow)
@@ -608,6 +606,9 @@ ScRegButton.place(relx=0.000,rely=0.5)
 #STRegButton
 STRegButton= Button(homeWindow, text="Student    Registration", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenParkingRegistrationWindow)
 STRegButton.place(relx=0.000,rely=0.6)
+
+secPicHolder = Label(homeWindow,text = "pic ng guard", width = 40, height = 20)
+secPicHolder.place(relx= 0.75, rely = 0.35)
 
 #DateLabel
 DayLabel= Label(homeWindow,text=dayNow, bg="#ccd6dd", font=("Segoe",50,"italic","bold"), width=2, height=1)
