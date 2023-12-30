@@ -334,18 +334,19 @@ def OpenSecurityRegistration():
         firstName VARCHAR(255),\
         lastName VARCHAR(255),\
         username VARCHAR(255),\
-        password VARCHAR(255))")
-    '''
-    idagdag to kapag nacode na ung file handling ng pictures
-    userPhoto VARCHAR(255)
-    '''
+        password VARCHAR(255),\
+        photo MEDIUMBLOB)")
 
+    currentFileName = ""
     def registerSecurity():
         password = pwField.get() 
         confirm = confirmPwField.get()
+        with open(currentFileName,"rb") as file:
+            photo = file.read()
+
         if password == confirm:
-            sqlCommand = "INSERT INTO registeredSecurity (firstName, lastName, username, password) VALUES (%s, %s, %s, %s)"
-            values = (fNameField.get(), lNameField.get(), usernameField.get(), pwField.get())
+            sqlCommand = "INSERT INTO registeredSecurity (firstName, lastName, username, password, photo) VALUES (%s, %s, %s, %s,%s)"
+            values = (fNameField.get(), lNameField.get(), usernameField.get(), pwField.get(), photo)
             cursor.execute(sqlCommand, values)
             DB.commit()
             messagebox.showinfo("Security Account Registration","Account Successfully Registered")
@@ -353,6 +354,19 @@ def OpenSecurityRegistration():
             secRegWin.destroy()
         else:
             messagebox.showinfo("Security Account Registration", "password and confirm password must be the same")
+    
+    def uploadPhoto():
+        nonlocal currentFileName
+        filePath = filedialog.askopenfilename(title = "Select an image")
+        currentFileName = filePath
+        #display pic in registration
+        displayPicCallImage = Image.open(filePath)
+        newSize = (110,110)
+        displayPicNewSize = displayPicCallImage.resize(newSize)
+        displayPic = ImageTk.PhotoImage(displayPicNewSize)
+        PicHolder= Label(secRegWin, image = displayPic)
+        PicHolder.place(relx=0.3, rely=0.63)
+        PicHolder.image = displayPic
 
     def fieldContentLogic(_var, _field):
         if _field == pwField:
@@ -387,7 +401,6 @@ def OpenSecurityRegistration():
     
     def backToLogin():
         secRegWin.destroy()
-        OpenSecurityLogInWindow()
 
     def varTrace(var, index, mode):
         fieldContentLogic(pwVar,pwField)
@@ -441,10 +454,11 @@ def OpenSecurityRegistration():
     confirmPwField.bind("<Button-1>",confirmClearOnClick)
 
     #buttons
+    '''
     PicHolder=Button(secRegWin, text="PHOTO HERE", bg="white", width=15,height=6)
     PicHolder.place(relx=0.3, rely=0.63)
-
-    UploadButton= Button(secRegWin,text="Upload photo", bg="white", width=15)
+    '''
+    UploadButton= Button(secRegWin,text="Upload photo", bg="white", width=15, command = uploadPhoto)
     UploadButton.place(relx=0.49,rely=0.67)
 
     Reg_button= Button(secRegWin, text="Register", bg="darkgreen" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command = registerSecurity)
@@ -584,7 +598,30 @@ def OpenParkingRegistrationWindow():
     backButton.place(relx= 0.7, rely=0.85)
 
 def OpenExportWindow():
-    return
+    exportWindow = Toplevel(homeWindow)
+    exportWindow.title("Export to Excel")
+    exportWindow.geometry("961x964")
+    exportWindow.iconbitmap("PNCLogo.ico")
+    exportWindowCallImage=Image.open("exportExcelWindowBG.png")
+    exportWindowBackground=ImageTk.PhotoImage(exportWindowCallImage)
+    exportWindowBG=Label(exportWindow,image=exportWindowBackground)
+    exportWindowBG.image = exportWindowBackground
+    exportWindowBG.grid(row=0, column=0)
+    exportWindow.resizable(False,False)
+
+    #label
+    ParkingLotScan= Label(exportWindow, text="Export Excel",font=("Segoe",30,"bold"),bg="darkgreen",width=20, height=1,)
+    ParkingLotScan.place(relx=0.249, rely=0.3,)
+
+    #button
+    ParkUserButton=Button(exportWindow, text="Park User", font=("Segoe",20),width=30,height=1)
+    ParkUserButton.place(relx=0.249, rely=0.4)
+
+    RegStFtButton=Button(exportWindow, text="Registered Student and Faculty", font=("Segoe",20),width=30,height=1)
+    RegStFtButton.place(relx=0.249, rely=0.5)
+
+    RegScButton=Button(exportWindow, text="Registered Security", font=("Segoe",20),width=30,height=1)
+    RegScButton.place(relx=0.249, rely=0.6)
 
 
 #label
@@ -592,7 +629,7 @@ ScanID= Label(homeWindow,text="Security Scanner Home Page", bg="gray", font=("Se
 ScanID.place(relx=0.001,rely=0.2)
 
 #ExpExcButton
-EXPButton= Button(homeWindow, text="Export    Excel", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3)
+EXPButton= Button(homeWindow, text="Export    Excel", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenExportWindow)
 EXPButton.place(relx=0.000,rely=0.3)
 
 #ScannedIDButton
