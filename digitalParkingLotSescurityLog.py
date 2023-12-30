@@ -41,19 +41,6 @@ dbase = mysql.connector.connect(
 )
 cursorDbase = dbase.cursor()
 
-def dbquery(): #temporary function
-    dataQuery = Tk()
-    dataQuery.title("registered Query")
-    dataQuery.geometry('800x600')
-    cursorDbase.execute("SELECT * FROM registeredUsers")
-    result = cursorDbase.fetchall()
-    for index, tableRow in enumerate(result):
-        num = 0
-        for tableColumn in tableRow:
-            dataQueryLabel = Label(dataQuery,text=tableColumn) 
-            dataQueryLabel.grid(row=index, column=num, padx=5)
-            num += 1
-
 def updateClock():
     rawTime = datetime.now()
     updateTime = rawTime.strftime("%I:%M:%S %p")
@@ -543,25 +530,6 @@ def OpenParkingRegistrationWindow():
     def goToScanWindow():
         parkRegWin.destroy()
 
-    def dbquery(): #this function is temporary. This just shows all data in the table
-        dataQuery = Tk()
-        dataQuery.title("Parking registered users Query")
-        dataQuery.geometry('800x600')
-        cursor.execute("SELECT * FROM registeredUsers")
-        result = cursor.fetchall()
-        for index, tableRow in enumerate(result):
-            num = 0
-            for tableColumn in tableRow:
-                dataQueryLabel = Label(dataQuery,text=tableColumn) 
-                # add index to x to get the specific field u want (eg x[0] would give you the 0th column of the database which is the first name) 
-                dataQueryLabel.grid(row=index, column=num, padx=5)
-                num += 1
-
-    def clearDB(): #temporary function
-        cursor.execute('DELETE FROM registeredUsers')
-        cursor.execute('ALTER TABLE registeredUsers AUTO_INCREMENT = 0')
-        DB.commit()
-
     def fNameClearOnClick(event):
         fNameField.delete(0,END)
     def lNameClearOnClick(event):
@@ -605,10 +573,6 @@ def OpenParkingRegistrationWindow():
     vehicleOptionsDrpDwn.place(relx=0.4,rely=0.672)
 
     #Buttons
-    '''
-    PicHolder= Button(parkRegWin, text="PHOTO HERE", bg="white", width=20,height=8)
-    PicHolder.place(relx=0.2, rely=0.3)
-    '''
 
     uploadPhotoButton= Button(parkRegWin, text="Upload Photo", bg="white", width=20, command=uploadPhoto)
     uploadPhotoButton.place(relx=0.6, rely=0.672)
@@ -619,12 +583,9 @@ def OpenParkingRegistrationWindow():
     backButton = Button(parkRegWin, text="Go Back", bg="gray" ,font=("Microsoft YaHei UI Light",10,"bold"),width=10, command=goToScanWindow)
     backButton.place(relx= 0.7, rely=0.85)
 
-    #temporary buttons
-    test_button = Button(parkRegWin, text="Query", bg="yellow" ,font=("Microsoft YaHei UI Light",10,"bold"),width=18, command=dbquery)
-    test_button.place(relx= 0.4, rely=0.75)
+def OpenExportWindow():
+    return
 
-    cleardb_button = Button(parkRegWin, text="Clear database", bg="yellow" ,font=("Microsoft YaHei UI Light",10,"bold"),width=12, command=clearDB)
-    cleardb_button.place(relx= 0.65, rely=0.75)
 
 #label
 ScanID= Label(homeWindow,text="Security Scanner Home Page", bg="gray", font=("Segoe",15), width=24, height=3)
