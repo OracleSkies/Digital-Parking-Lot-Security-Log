@@ -25,6 +25,9 @@ dayNow = time.strftime("%d")
 monthNow = time.strftime("%B")
 yearNow = time.strftime("%Y")
 
+currSecUID = (0,)
+secOnDutyFullName = ""
+
 Database = mysql.connector.connect(
     host = 'localhost',
     user = 'root',
@@ -253,8 +256,6 @@ def OpenSecurityLogInWindow():
         database = 'digitalParkingLotSecurityLogDatabase',
     )
 
-    loginText= Label(securityLogInWindow, text="SECURITY LOG IN",font="berlinsans",bg="darkgreen",width=20, height=1,)
-    loginText.place(relx=0.27, rely=0.28,)
     def varTrace(var,index,mode):
         fieldContentLogic(pwVar, pwField)
 
@@ -274,6 +275,7 @@ def OpenSecurityLogInWindow():
         securityLogInWindow.destroy()
     
     def accountLogIn():
+        global currSecUID
         cursor = DB.cursor()
         sqlCommand = "SELECT * FROM registeredSecurity WHERE username = %s AND password = %s"
         usernameInput = usernameField.get()
@@ -283,9 +285,17 @@ def OpenSecurityLogInWindow():
         result = cursor.fetchone()
         if result:
             messagebox.showinfo("Security Log-In","Account successfully logged in")
+            sqlUID = "SELECT userID FROM registeredSecurity WHERE username = %s AND password = %s"
+            cursor.execute(sqlUID, account)
+            resultUID = cursor.fetchone()
+            currSecUID = resultUID
+            SecurityOnDutySetUp()
             securityLogInWindow.destroy()
         else:
             messagebox.showinfo("Security Log-In", "Account not found")
+
+    loginText= Label(securityLogInWindow, text="SECURITY LOG IN",font="berlinsans",bg="darkgreen",width=20, height=1,)
+    loginText.place(relx=0.27, rely=0.28,)
 
     #entryfields
     usernameField= Entry(securityLogInWindow, fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light", 10),width=17)
@@ -309,6 +319,7 @@ def OpenSecurityLogInWindow():
 
     securityLogInWindow.protocol("WM_DELETE_WINDOW",lambda: releaseGrab(securityLogInWindow))
     securityLogInWindow.grab_set()   
+    
 
 def OpenSecurityRegistration():
     secRegWin = Toplevel(homeWindow)
@@ -587,6 +598,32 @@ def OpenExportWindow():
     RegScButton=Button(exportWindow, text="Registered Security", font=("Segoe",20),width=30,height=1)
     RegScButton.place(relx=0.249, rely=0.6)
 
+def SecurityOnDutySetUp():
+    global secOnDutyFullName
+    sqlSecFName = "SELECT firstName FROM registeredSecurity WHERE userID = %s"
+    sqlSecLName = "SELECT lastName FROM registeredSecurity WHERE userID = %s"
+    sqlSecPhoto = "SELECT photo FROM registeredSecurity WHERE userID = %s"
+
+    #name setup
+    cursorDbase.execute(sqlSecFName, currSecUID)
+    secFName = cursorDbase.fetchone()
+    cursorDbase.execute(sqlSecLName, currSecUID)
+    secLName = cursorDbase.fetchone()
+    secOnDutyFullName = secLName[0].upper() + ", " +  secFName[0]
+    FNlabel.config(text = secOnDutyFullName)
+
+    #image setup
+    cursorDbase.execute(sqlSecPhoto, currSecUID)
+    secPhoto = cursorDbase.fetchone()
+    resultPhoto = secPhoto[0]
+    callPhoto = Image.open(io.BytesIO(resultPhoto))
+    newSize = (200, 200)
+    profilePic = callPhoto.resize(newSize)
+    displayPic = ImageTk.PhotoImage(profilePic)
+    secPicHolder = Label(homeWindow, image = displayPic)
+    secPicHolder.image = displayPic
+    secPicHolder.place(relx= 0.75, rely = 0.35)
+
 #label
 ScanID= Label(homeWindow,text="Security Scanner Home Page", bg="gray", font=("Segoe",15), width=24, height=3)
 ScanID.place(relx=0.001,rely=0.2)
@@ -607,9 +644,6 @@ ScRegButton.place(relx=0.000,rely=0.5)
 STRegButton= Button(homeWindow, text="Student    Registration", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenParkingRegistrationWindow)
 STRegButton.place(relx=0.000,rely=0.6)
 
-secPicHolder = Label(homeWindow,text = "pic ng guard", width = 40, height = 20)
-secPicHolder.place(relx= 0.75, rely = 0.35)
-
 #DateLabel
 DayLabel= Label(homeWindow,text=dayNow, bg="#ccd6dd", font=("Segoe",50,"italic","bold"), width=2, height=1)
 DayLabel.place(relx=0.76,rely=0.1975)
@@ -624,7 +658,7 @@ TimeLabel= Label(homeWindow, fg="darkgreen",bg="#ccd6dd", font=("Segoe",20,"ital
 TimeLabel.place(relx=0.82,rely=0.26)
 
 #fullNameLabel
-FNlabel=Label(homeWindow,text="SURNAME, First Name, MI.",fg="white", bg="#167237", font=("Segoe",25), width=25, height=1)
+FNlabel=Label(homeWindow,fg="white", bg="#167237", font=("Segoe",25), width=25, height=1)
 FNlabel.place(relx=0.675, rely=0.025)
 
 
