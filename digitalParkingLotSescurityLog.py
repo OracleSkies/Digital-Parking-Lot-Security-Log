@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk, messagebox, filedialog
 from PIL import ImageTk,Image
 from datetime import datetime
+import time
 import io
 import mysql.connector
 import csv
@@ -17,13 +18,13 @@ homeWindowBG.image = homeWindowBackground
 homeWindowBG.grid(row=0, column=0)
 homeWindow.resizable(False,False)
 
-time = datetime.now()
-timeNow = time.strftime("%H:%M")
-fullTimeNow = time.strftime("%I:%M:%S %p")
-dateNow = time.strftime("%b %d, %Y")
-dayNow = time.strftime("%d")
-monthNow = time.strftime("%B")
-yearNow = time.strftime("%Y")
+globalTime = datetime.now()
+timeNow = globalTime.strftime("%H:%M")
+fullTimeNow = globalTime.strftime("%I:%M:%S %p")
+dateNow = globalTime.strftime("%b %d, %Y")
+dayNow = globalTime.strftime("%d")
+monthNow = globalTime.strftime("%B")
+yearNow = globalTime.strftime("%Y")
 
 currSecUID = (0,)
 secOnDutyFullName = ""
@@ -45,8 +46,11 @@ dbase = mysql.connector.connect(
 cursorDbase = dbase.cursor()
 
 def updateClock():
+    global timeNow
     rawTime = datetime.now()
     updateTime = rawTime.strftime("%I:%M:%S %p")
+    timeNow = rawTime.strftime("%H:%M")
+    print(timeNow)
     TimeLabel.config(text = updateTime)
     TimeLabel.after(1000,updateClock)
 
@@ -104,6 +108,7 @@ def OpenScanWindow():
             cursor.execute(sqlSearch,stdnNumber)
             isUserParked = cursor.fetchone()
             if not isUserParked: #park going in
+                global timeNow
                 sqlFName = "SELECT firstName FROM registeredUsers WHERE studentNumber = %s"
                 cursor.execute(sqlFName,stdnNumber)
                 resultFName = cursor.fetchone()
@@ -161,9 +166,9 @@ def OpenScanWindow():
                 cursor.execute(sqlTimeIn,stdnNumber)
                 resultTimeIn = cursor.fetchone()
                 parkStatus = "out"
-                timeOut = timeNow
+                #timeOut = timeNow
                 sqlTimeOut = "UPDATE parkedUsers SET timeOut = %s WHERE studentNumber = %s"
-                cursor.execute(sqlTimeOut, (timeOut, int(stdnNumber[0])))
+                cursor.execute(sqlTimeOut, (timeNow, int(stdnNumber[0])))
                 sqlParkStatus = "UPDATE parkedUsers SET parkStatus = %s WHERE studentNumber = %s"
                 cursor.execute(sqlParkStatus, (str(parkStatus),int(stdnNumber[0])))
 
@@ -178,7 +183,7 @@ def OpenScanWindow():
                 profilePic = ImageTk.PhotoImage(profilePicNewSize)
                 DB.commit()
 
-                OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV, profilePic, resultTimeIn, timeOut)
+                OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV, profilePic, resultTimeIn, timeNow)
 
         else: #data does not exist
             response = messagebox.askquestion("Student number not recognized", "Would you like to register a new student?")
