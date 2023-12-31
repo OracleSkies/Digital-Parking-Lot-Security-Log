@@ -19,6 +19,7 @@ homeWindow.resizable(False,False)
 
 time = datetime.now()
 timeNow = time.strftime("%H:%M")
+timeOut = ""
 fullTimeNow = time.strftime("%I:%M:%S %p")
 dateNow = time.strftime("%b %d, %Y")
 dayNow = time.strftime("%d")
@@ -99,20 +100,18 @@ def OpenScanWindow():
             vehicleType VARCHAR(255), \
             date VARCHAR(255),\
             timeIn VARCHAR(255), \
-            timeOut VARCHAR(255))")
-        '''
-            idagdag to kapag na-code na ung file handling for pictures
-            userPhoto VARCHAR(255), \ # gumamit ng VARCHAR kasi ififile handle ung name ng image file
-            vechiclePhoto VARCHAR(255)\
-        '''
+            timeOut VARCHAR(255),\
+            parkStatus VARCHAR(10))")
+        
 
         sqlCommand = "SELECT * FROM registeredUsers WHERE studentNumber = %s" 
         scannedStdnNo = scanIDfield.get()
         stdnNumber = (scannedStdnNo, )
         cursor.execute(sqlCommand, stdnNumber)
         result = cursor.fetchone()
-        #checker lang to. Trash this
         if result:
+
+
             sqlFName = "SELECT firstName FROM registeredUsers WHERE studentNumber = %s"
             cursor.execute(sqlFName,stdnNumber)
             resultFName = cursor.fetchone()
@@ -128,6 +127,7 @@ def OpenScanWindow():
             sqlTOV = "SELECT vehicleType FROM registeredUsers WHERE studentNumber = %s"
             cursor.execute(sqlTOV, stdnNumber)
             resultTOV = cursor.fetchone()
+            parkStatus = "in"
 
             #for photos
             sqlPhoto = "SELECT userPhoto FROM registeredUsers WHERE studentNumber = %s"
@@ -139,8 +139,8 @@ def OpenScanWindow():
             profilePicNewSize = callPhoto.resize(newSize)
             profilePic = ImageTk.PhotoImage(profilePicNewSize)
             #insertion to parkeduser table
-            sqlCommand2 = "INSERT INTO parkedUsers (firstName, lastName, studentNumber, department, vehicleType, date, timeIn) VALUES (%s, %s, %s, %s, %s, %s ,%s)"
-            values = (str(resultFName[0]), str(resultLName[0]), int(stdnNumber[0]), str(resultDept[0]), str(resultTOV[0]), dateNow, timeNow)
+            sqlCommand2 = "INSERT INTO parkedUsers (firstName, lastName, studentNumber, department, vehicleType, date, timeIn, parkStatus) VALUES (%s, %s, %s, %s, %s, %s ,%s, %s)"
+            values = (str(resultFName[0]), str(resultLName[0]), int(stdnNumber[0]), str(resultDept[0]), str(resultTOV[0]), dateNow, timeNow, parkStatus)
             cursor.execute(sqlCommand2,values)
             DB.commit()
 
@@ -148,9 +148,9 @@ def OpenScanWindow():
             OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV, profilePic)
 
         else: #data does not exist
-            #open registration Window
-            #put message box and additional ifelse logic here if go to register or scan another
-            OpenParkingRegistrationWindow()
+            response = messagebox.askquestion("Student number not recognized", "Would you like to register a new student?")
+            if response == "yes":
+                OpenParkingRegistrationWindow()
 
     DTholder= Label(scanWindow,text= " ", font=("Segoe",10),bg="#f8faf7", width=25, height=1)
     DTholder.place(relx=0.53, rely=0.02)
@@ -225,7 +225,7 @@ def OpenParkingStatusWindow(_name,_dept,_stdNum,_TOV,_photo):
     TimeInFill=Label(parkStatWin, text=timeNow,font=("berlinsans",15),bg="lightgreen" ,width=9, height=1)
     TimeInFill.place(relx=0.03,rely=0.85)
 
-    TimeOutFill=Label(parkStatWin, text=timeNow,font=("berlinsans",15),bg="lightgreen" ,width=10, height=1)
+    TimeOutFill=Label(parkStatWin, text=timeOut,font=("berlinsans",15),bg="lightgreen" ,width=10, height=1)
     TimeOutFill.place(relx=0.3,rely=0.85)
 
     #for picture
@@ -320,7 +320,6 @@ def OpenSecurityLogInWindow():
     securityLogInWindow.protocol("WM_DELETE_WINDOW",lambda: releaseGrab(securityLogInWindow))
     securityLogInWindow.grab_set()   
     
-
 def OpenSecurityRegistration():
     secRegWin = Toplevel(homeWindow)
     secRegWin.title("PNC Parking Security Account Registration")
@@ -426,7 +425,6 @@ def OpenSecurityRegistration():
     usernameField.insert(0,"                            Username")
     usernameField.bind("<Button-1>",usernameClearOnClick)
 
-    #put some logic for the show="*" para makita ung text
     pwVar = StringVar()
     pwVar.trace_add('write', varTrace)
     pwField= Entry(secRegWin, textvariable = pwVar, width=40, fg="black",border=2, bg="white", font=("Microsoft YaHei UI Light", 9))
@@ -505,8 +503,8 @@ def OpenParkingRegistrationWindow():
     def uploadPhoto():
         nonlocal currentFileName
         filePath = filedialog.askopenfilename(title = "Select an image")
-        #fileName = os.path.basename(filePath)
         currentFileName = filePath
+
         #display pic in registration
         displayPicCallImage = Image.open(filePath)
         newSize = (140,140)
