@@ -50,7 +50,6 @@ def updateClock():
     rawTime = datetime.now()
     updateTime = rawTime.strftime("%I:%M:%S %p")
     timeNow = rawTime.strftime("%H:%M")
-    print(timeNow)
     TimeLabel.config(text = updateTime)
     TimeLabel.after(1000,updateClock)
 
@@ -166,7 +165,6 @@ def OpenScanWindow():
                 cursor.execute(sqlTimeIn,stdnNumber)
                 resultTimeIn = cursor.fetchone()
                 parkStatus = "out"
-                #timeOut = timeNow
                 sqlTimeOut = "UPDATE parkedUsers SET timeOut = %s WHERE studentNumber = %s"
                 cursor.execute(sqlTimeOut, (timeNow, int(stdnNumber[0])))
                 sqlParkStatus = "UPDATE parkedUsers SET parkStatus = %s WHERE studentNumber = %s"
