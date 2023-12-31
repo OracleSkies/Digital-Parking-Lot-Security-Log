@@ -19,7 +19,6 @@ homeWindow.resizable(False,False)
 
 time = datetime.now()
 timeNow = time.strftime("%H:%M")
-timeOut = ""
 fullTimeNow = time.strftime("%I:%M:%S %p")
 dateNow = time.strftime("%b %d, %Y")
 dayNow = time.strftime("%d")
@@ -82,15 +81,6 @@ def OpenScanWindow():
             database = 'digitalParkingLotSecurityLogDatabase',
         )
         cursor = DB.cursor()
-        '''
-        cursor.execute("CREATE TABLE IF NOT EXISTS registeredUsers (\
-            userID INT AUTO_INCREMENT PRIMARY KEY,\
-            firstName VARCHAR(255), \
-            lastName VARCHAR(255), \
-            studentNumber INT(20), \
-            department VARCHAR(255), \
-            vehicleType VARCHAR(255))")
-            '''
         cursor.execute("CREATE TABLE IF NOT EXISTS parkedUsers (\
             userID INT AUTO_INCREMENT PRIMARY KEY,\
             firstName VARCHAR(255), \
@@ -114,7 +104,6 @@ def OpenScanWindow():
             cursor.execute(sqlSearch,stdnNumber)
             isUserParked = cursor.fetchone()
             if not isUserParked: #park going in
-                print("user not parked")
                 sqlFName = "SELECT firstName FROM registeredUsers WHERE studentNumber = %s"
                 cursor.execute(sqlFName,stdnNumber)
                 resultFName = cursor.fetchone()
@@ -153,7 +142,6 @@ def OpenScanWindow():
                 OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV, profilePic,timeNow,timeOut)
 
             else: #park going out
-                print("user is parked")
                 sqlFName = "SELECT firstName FROM parkedUsers WHERE studentNumber = %s"
                 cursor.execute(sqlFName,stdnNumber)
                 resultFName = cursor.fetchone()
