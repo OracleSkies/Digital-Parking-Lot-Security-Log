@@ -110,42 +110,87 @@ def OpenScanWindow():
         cursor.execute(sqlCommand, stdnNumber)
         result = cursor.fetchone()
         if result:
+            sqlSearch = "SELECT * FROM parkedUsers WHERE studentNumber = %s"
+            cursor.execute(sqlSearch,stdnNumber)
+            isUserParked = cursor.fetchone()
+            if not isUserParked: #park going in
+                print("user not parked")
+                sqlFName = "SELECT firstName FROM registeredUsers WHERE studentNumber = %s"
+                cursor.execute(sqlFName,stdnNumber)
+                resultFName = cursor.fetchone()
+                sqlLName = "SELECT lastName FROM registeredUsers WHERE studentNumber = %s"
+                cursor.execute(sqlLName, stdnNumber)
+                resultLName = cursor.fetchone()
+                firstName = resultFName[0]
+                lastName = resultLName[0]
+                resultName = firstName + " " + lastName
+                sqlDept = "SELECT department FROM registeredUsers WHERE studentNumber = %s"
+                cursor.execute(sqlDept, stdnNumber)
+                resultDept = cursor.fetchone()
+                sqlTOV = "SELECT vehicleType FROM registeredUsers WHERE studentNumber = %s"
+                cursor.execute(sqlTOV, stdnNumber)
+                resultTOV = cursor.fetchone()
+                parkStatus = "in"
+                timeOut = ""
 
+                #for photos
+                sqlPhoto = "SELECT userPhoto FROM registeredUsers WHERE studentNumber = %s"
+                cursor.execute(sqlPhoto, stdnNumber)
+                resultPhoto = cursor.fetchone()
+                getPhoto = resultPhoto[0]
+                callPhoto = Image.open(io.BytesIO(getPhoto))
+                newSize = (150,150)
+                profilePicNewSize = callPhoto.resize(newSize)
+                profilePic = ImageTk.PhotoImage(profilePicNewSize)
 
-            sqlFName = "SELECT firstName FROM registeredUsers WHERE studentNumber = %s"
-            cursor.execute(sqlFName,stdnNumber)
-            resultFName = cursor.fetchone()
-            sqlLName = "SELECT lastName FROM registeredUsers WHERE studentNumber = %s"
-            cursor.execute(sqlLName, stdnNumber)
-            resultLName = cursor.fetchone()
-            firstName = resultFName[0]
-            lastName = resultLName[0]
-            resultName = firstName + " " + lastName
-            sqlDept = "SELECT department FROM registeredUsers WHERE studentNumber = %s"
-            cursor.execute(sqlDept, stdnNumber)
-            resultDept = cursor.fetchone()
-            sqlTOV = "SELECT vehicleType FROM registeredUsers WHERE studentNumber = %s"
-            cursor.execute(sqlTOV, stdnNumber)
-            resultTOV = cursor.fetchone()
-            parkStatus = "in"
+                #insertion to parkeduser table
+                sqlCommand2 = "INSERT INTO parkedUsers (firstName, lastName, studentNumber, department, vehicleType, date, timeIn, parkStatus) VALUES (%s, %s, %s, %s, %s, %s ,%s, %s)"
+                values = (str(resultFName[0]), str(resultLName[0]), int(stdnNumber[0]), str(resultDept[0]), str(resultTOV[0]), dateNow, timeNow, parkStatus)
+                cursor.execute(sqlCommand2,values)
+                DB.commit()
 
-            #for photos
-            sqlPhoto = "SELECT userPhoto FROM registeredUsers WHERE studentNumber = %s"
-            cursor.execute(sqlPhoto, stdnNumber)
-            resultPhoto = cursor.fetchone()
-            getPhoto = resultPhoto[0]
-            callPhoto = Image.open(io.BytesIO(getPhoto))
-            newSize = (150,150)
-            profilePicNewSize = callPhoto.resize(newSize)
-            profilePic = ImageTk.PhotoImage(profilePicNewSize)
-            #insertion to parkeduser table
-            sqlCommand2 = "INSERT INTO parkedUsers (firstName, lastName, studentNumber, department, vehicleType, date, timeIn, parkStatus) VALUES (%s, %s, %s, %s, %s, %s ,%s, %s)"
-            values = (str(resultFName[0]), str(resultLName[0]), int(stdnNumber[0]), str(resultDept[0]), str(resultTOV[0]), dateNow, timeNow, parkStatus)
-            cursor.execute(sqlCommand2,values)
-            DB.commit()
+                #display of info
+                OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV, profilePic,timeNow,timeOut)
 
-            #display of info
-            OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV, profilePic)
+            else: #park going out
+                print("user is parked")
+                sqlFName = "SELECT firstName FROM parkedUsers WHERE studentNumber = %s"
+                cursor.execute(sqlFName,stdnNumber)
+                resultFName = cursor.fetchone()
+                sqlLName = "SELECT lastName FROM parkedUsers WHERE studentNumber = %s"
+                cursor.execute(sqlLName, stdnNumber)
+                resultLName = cursor.fetchone()
+                firstName = resultFName[0]
+                lastName = resultLName[0]
+                resultName = firstName + " " + lastName
+                sqlDept = "SELECT department FROM parkedUsers WHERE studentNumber = %s"
+                cursor.execute(sqlDept, stdnNumber)
+                resultDept = cursor.fetchone()
+                sqlTOV = "SELECT vehicleType FROM parkedUsers WHERE studentNumber = %s"
+                cursor.execute(sqlTOV, stdnNumber)
+                resultTOV = cursor.fetchone()
+                sqlTimeIn = "SELECT timeIn FROM parkedUsers WHERE studentNumber = %s"
+                cursor.execute(sqlTimeIn,stdnNumber)
+                resultTimeIn = cursor.fetchone()
+                parkStatus = "out"
+                timeOut = timeNow
+                sqlTimeOut = "UPDATE parkedUsers SET timeOut = %s WHERE studentNumber = %s"
+                cursor.execute(sqlTimeOut, (timeOut, int(stdnNumber[0])))
+                sqlParkStatus = "UPDATE parkedUsers SET parkStatus = %s WHERE studentNumber = %s"
+                cursor.execute(sqlParkStatus, (str(parkStatus),int(stdnNumber[0])))
+
+                #for image
+                sqlPhoto = "SELECT userPhoto FROM registeredUsers WHERE studentNumber = %s"
+                cursor.execute(sqlPhoto, stdnNumber)
+                resultPhoto = cursor.fetchone()
+                getPhoto = resultPhoto[0]
+                callPhoto = Image.open(io.BytesIO(getPhoto))
+                newSize = (150,150)
+                profilePicNewSize = callPhoto.resize(newSize)
+                profilePic = ImageTk.PhotoImage(profilePicNewSize)
+                DB.commit()
+
+                OpenParkingStatusWindow(resultName,resultDept[0],stdnNumber,resultTOV, profilePic, resultTimeIn, timeOut)
 
         else: #data does not exist
             response = messagebox.askquestion("Student number not recognized", "Would you like to register a new student?")
@@ -173,7 +218,7 @@ def OpenScanWindow():
     
     updateClock()
 
-def OpenParkingStatusWindow(_name,_dept,_stdNum,_TOV,_photo):
+def OpenParkingStatusWindow(_name,_dept,_stdNum,_TOV,_photo,_timeIn,_timeOut):
     parkStatWin = Toplevel(homeWindow)
     parkStatWin.title("PNC Parking")
     parkStatWin.geometry("800x450")
@@ -222,10 +267,10 @@ def OpenParkingStatusWindow(_name,_dept,_stdNum,_TOV,_photo):
     TimeOut=Label(parkStatWin, text="Time out:",font=("berlinsans",15),bg="gray" ,width=8, height=1)
     TimeOut.place(relx=0.3,rely=0.75)
 
-    TimeInFill=Label(parkStatWin, text=timeNow,font=("berlinsans",15),bg="lightgreen" ,width=9, height=1)
+    TimeInFill=Label(parkStatWin, text=_timeIn,font=("berlinsans",15),bg="lightgreen" ,width=9, height=1)
     TimeInFill.place(relx=0.03,rely=0.85)
 
-    TimeOutFill=Label(parkStatWin, text=timeOut,font=("berlinsans",15),bg="lightgreen" ,width=10, height=1)
+    TimeOutFill=Label(parkStatWin, text=_timeOut,font=("berlinsans",15),bg="lightgreen" ,width=10, height=1)
     TimeOutFill.place(relx=0.3,rely=0.85)
 
     #for picture
