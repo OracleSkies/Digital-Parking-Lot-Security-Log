@@ -618,12 +618,27 @@ def OpenExportWindow():
     exportWindowBG.grid(row=0, column=0)
     exportWindow.resizable(False,False)
 
+    def exportToExcel(_table):
+        DB = mysql.connector.connect(
+            host = 'localhost',
+            user = 'root',
+            passwd = 'password123',
+            database = 'digitalParkingLotSecurityLogDatabase',
+        )
+        cursor = DB.cursor()
+        sqlCommand = f"SELECT * FROM {_table}"
+        cursor.execute(sqlCommand)
+        result = cursor.fetchall()
+        with open("test.csv", "a", newline="")as file:
+            writer = csv.writer(file,dialect='excel')
+            for record in result:
+                writer.writerow(record)
     #label
     ParkingLotScan= Label(exportWindow, text="Export Excel",font=("Segoe",30,"bold"),bg="darkgreen",width=20, height=1,)
     ParkingLotScan.place(relx=0.249, rely=0.3,)
 
     #button
-    ParkUserButton=Button(exportWindow, text="Park User", font=("Segoe",20),width=30,height=1)
+    ParkUserButton=Button(exportWindow, text="Park User", font=("Segoe",20),width=30,height=1, command=lambda: exportToExcel("parkedUsers"))
     ParkUserButton.place(relx=0.249, rely=0.4)
 
     RegStFtButton=Button(exportWindow, text="Registered Student and Faculty", font=("Segoe",20),width=30,height=1)
