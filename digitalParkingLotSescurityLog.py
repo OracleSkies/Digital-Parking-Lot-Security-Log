@@ -583,7 +583,7 @@ def OpenParkingRegistrationWindow():
 
     StudentNoField= Entry(parkRegWin, width=43, fg="black", border=2, bg="white",font=("Microsoft YaHei UI Light",10))
     StudentNoField.place(relx=0.4,rely=0.425)
-    StudentNoField.insert(0,"Faculty / Student No.")
+    StudentNoField.insert(0,"Student No.")
     StudentNoField.bind("<Button-1>",studentNoClearOnClick)
 
     #Combo Boxes
@@ -626,26 +626,35 @@ def OpenExportWindow():
             database = 'digitalParkingLotSecurityLogDatabase',
         )
         cursor = DB.cursor()
+        #lagay ng if statement
+        if _table == "parkedUsers":
+            exportFileName = "Daily Parking Log " + dateNow + ".csv"
+        elif _table == "registeredUsers":
+            exportFileName = "Registered Parking Users " + timeNow + " "+  dateNow+ ".csv"
+        
         sqlCommand = f"SELECT * FROM {_table}"
         cursor.execute(sqlCommand)
+        columnNames = [col[0] for col in cursor.description]
         result = cursor.fetchall()
-        with open("test.csv", "a", newline="")as file:
+        with open(exportFileName, "a", newline="")as file:
             writer = csv.writer(file,dialect='excel')
+            writer.writerow(columnNames)
             for record in result:
                 writer.writerow(record)
+        messagebox.showinfo("File Export", exportFileName + " has successfully been exported")
+        exportWindow.destroy()
+
     #label
     ParkingLotScan= Label(exportWindow, text="Export Excel",font=("Segoe",30,"bold"),bg="darkgreen",width=20, height=1,)
     ParkingLotScan.place(relx=0.249, rely=0.3,)
 
     #button
-    ParkUserButton=Button(exportWindow, text="Park User", font=("Segoe",20),width=30,height=1, command=lambda: exportToExcel("parkedUsers"))
+    ParkUserButton=Button(exportWindow, text="Daily Parking Log", font=("Segoe",20),width=30,height=1, command=lambda: exportToExcel("parkedUsers"))
     ParkUserButton.place(relx=0.249, rely=0.4)
 
-    RegStFtButton=Button(exportWindow, text="Registered Student and Faculty", font=("Segoe",20),width=30,height=1)
+    RegStFtButton=Button(exportWindow, text="Registered Parking Users", font=("Segoe",20),width=30,height=1, command=lambda: exportToExcel("registeredUsers"))
     RegStFtButton.place(relx=0.249, rely=0.5)
 
-    RegScButton=Button(exportWindow, text="Registered Security", font=("Segoe",20),width=30,height=1)
-    RegScButton.place(relx=0.249, rely=0.6)
 
 def SecurityOnDutySetUp():
     global secOnDutyFullName
@@ -674,24 +683,24 @@ def SecurityOnDutySetUp():
     secPicHolder.place(relx= 0.75, rely = 0.35)
 
 #label
-ScanID= Label(homeWindow,text="Security Scanner Home Page", bg="gray", font=("Segoe",15), width=24, height=3)
+ScanID= Label(homeWindow,text="Security Scanner Home Page", bg="green", font=("Segoe",15), width=24, height=3)
 ScanID.place(relx=0.001,rely=0.2)
 
-#ExpExcButton
-EXPButton= Button(homeWindow, text="Export    Excel", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenExportWindow)
-EXPButton.place(relx=0.000,rely=0.3)
-
 #ScannedIDButton
-scIDButton= Button(homeWindow, text="Scanned    ID", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenScanWindow)
-scIDButton.place(relx=0.000,rely=0.4)
+scIDButton= Button(homeWindow, text="ID Scanning", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenScanWindow)
+scIDButton.place(relx=0.000,rely=0.3)
 
 #ScRegButton
 ScRegButton= Button(homeWindow, text="Security    Registration", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenSecurityRegistration)
-ScRegButton.place(relx=0.000,rely=0.5)
+ScRegButton.place(relx=0.000,rely=0.4)
 
 #STRegButton
 STRegButton= Button(homeWindow, text="Student    Registration", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenParkingRegistrationWindow)
-STRegButton.place(relx=0.000,rely=0.6)
+STRegButton.place(relx=0.000,rely=0.5)
+
+#ExpExcButton
+EXPButton= Button(homeWindow, text="Export    Excel", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenExportWindow)
+EXPButton.place(relx=0.000,rely=0.6)
 
 #DateLabel
 DayLabel= Label(homeWindow,text=dayNow, bg="#ccd6dd", font=("Segoe",50,"italic","bold"), width=2, height=1)
