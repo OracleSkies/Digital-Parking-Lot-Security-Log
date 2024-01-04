@@ -396,7 +396,6 @@ def OpenSecurityRegistration():
             cursor.execute(sqlCommand, values)
             DB.commit()
             messagebox.showinfo("Security Account Registration","Account Successfully Registered")
-            OpenSecurityLogInWindow()
             secRegWin.destroy()
         else:
             messagebox.showinfo("Security Account Registration", "password and confirm password must be the same")
