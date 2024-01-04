@@ -520,7 +520,7 @@ def OpenParkingRegistrationWindow():
         department VARCHAR(255), \
         vehicleType VARCHAR(255),\
         userPhoto MEDIUMBLOB)")
-        #add if statement that checks if currentFileName is empty
+        
         with open(currentFileName,"rb") as file:
             photo = file.read()
         
@@ -651,7 +651,6 @@ def OpenExportWindow():
             exportWindow.destroy()
         else:
             exportFileName = ""
-        
         
 
     #label
