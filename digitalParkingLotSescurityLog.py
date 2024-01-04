@@ -509,11 +509,6 @@ def OpenParkingRegistrationWindow():
         department VARCHAR(255), \
         vehicleType VARCHAR(255),\
         userPhoto MEDIUMBLOB)")
-    '''
-        idagdag to kapag na-code na ung file handling for pictures
-        userPhoto VARCHAR(255), \ # gumamit ng VARCHAR kasi ififile handle ung name ng image file
-        vechiclePhoto VARCHAR(255)\
-        '''
     currentFileName = ""
     def registerUser():
         #table
@@ -541,7 +536,6 @@ def OpenParkingRegistrationWindow():
         filePath = filedialog.askopenfilename(title = "Select an image")
         currentFileName = filePath
 
-        #display pic in registration
         displayPicCallImage = Image.open(filePath)
         newSize = (140,140)
         displayPicNewSize = displayPicCallImage.resize(newSize)
@@ -629,20 +623,36 @@ def OpenExportWindow():
         #lagay ng if statement
         if _table == "parkedUsers":
             exportFileName = "Daily Parking Log " + dateNow + ".csv"
+            
+            sqlCommand = f"SELECT * FROM {_table}"
+            cursor.execute(sqlCommand)
+            columnNames = [col[0] for col in cursor.description]
+            result = cursor.fetchall()
+            with open(exportFileName, "w", newline="")as file:
+                writer = csv.writer(file,dialect='excel')
+                writer.writerow(columnNames)
+                for record in result:
+                    writer.writerow(record)
+            messagebox.showinfo("File Export", exportFileName + " has successfully been exported")
+            exportWindow.destroy()
+
         elif _table == "registeredUsers":
-            exportFileName = "Registered Parking Users " + timeNow + " "+  dateNow+ ".csv"
+            exportFileName = "Registered Parking Users " + dateNow + ".csv"
+            sqlCommand = f"SELECT userID,firstName, lastName, studentnumber, department, vehicleType FROM {_table}"
+            cursor.execute(sqlCommand)
+            columnNames = [col[0] for col in cursor.description]
+            result = cursor.fetchall()
+            with open(exportFileName, "w", newline="")as file:
+                writer = csv.writer(file,dialect='excel')
+                writer.writerow(columnNames)
+                for record in result:
+                    writer.writerow(record)
+            messagebox.showinfo("File Export", exportFileName + " has successfully been exported")
+            exportWindow.destroy()
+        else:
+            exportFileName = ""
         
-        sqlCommand = f"SELECT * FROM {_table}"
-        cursor.execute(sqlCommand)
-        columnNames = [col[0] for col in cursor.description]
-        result = cursor.fetchall()
-        with open(exportFileName, "a", newline="")as file:
-            writer = csv.writer(file,dialect='excel')
-            writer.writerow(columnNames)
-            for record in result:
-                writer.writerow(record)
-        messagebox.showinfo("File Export", exportFileName + " has successfully been exported")
-        exportWindow.destroy()
+        
 
     #label
     ParkingLotScan= Label(exportWindow, text="Export Excel",font=("Segoe",30,"bold"),bg="darkgreen",width=20, height=1,)
@@ -690,13 +700,13 @@ ScanID.place(relx=0.001,rely=0.2)
 scIDButton= Button(homeWindow, text="ID Scanning", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenScanWindow)
 scIDButton.place(relx=0.000,rely=0.3)
 
-#ScRegButton
-ScRegButton= Button(homeWindow, text="Security    Registration", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenSecurityRegistration)
-ScRegButton.place(relx=0.000,rely=0.4)
-
 #STRegButton
 STRegButton= Button(homeWindow, text="Student    Registration", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenParkingRegistrationWindow)
-STRegButton.place(relx=0.000,rely=0.5)
+STRegButton.place(relx=0.000,rely=0.4)
+
+#ScRegButton
+ScRegButton= Button(homeWindow, text="Security    Registration", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenSecurityRegistration)
+ScRegButton.place(relx=0.000,rely=0.5)
 
 #ExpExcButton
 EXPButton= Button(homeWindow, text="Export    Excel", bg="#f8faf7" ,font=("Segoe",15),width=24, height=3, command = OpenExportWindow)
@@ -718,7 +728,6 @@ TimeLabel.place(relx=0.82,rely=0.26)
 #fullNameLabel
 FNlabel=Label(homeWindow,fg="white", bg="#167237", font=("Segoe",25), width=25, height=1)
 FNlabel.place(relx=0.675, rely=0.025)
-
 
 updateClock()
 OpenSecurityLogInWindow()
