@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from PIL import ImageTk,Image
+from icecream import ic
 import mysql.connector
 import csv
 
@@ -9,6 +10,14 @@ root.title('MySQLDBExp')
 root.iconbitmap('PNCLogo.ico')
 root.geometry('400x400')
 
+
+dbInit = mysql.connector.connect(
+    host = 'localhost',
+    user = 'root',
+    passwd = 'password123'
+)
+initCursor = dbInit.cursor()
+initCursor.execute("CREATE DATABASE IF NOT EXISTS experimentDatabase")
 #connection to MySQL
 db = mysql.connector.connect(
     host = 'localhost',
@@ -21,7 +30,7 @@ db = mysql.connector.connect(
 cursor = db.cursor()
 
 #create database
-cursor.execute("CREATE DATABASE IF NOT EXISTS experimentDatabase")
+
 
 #database creation test
 '''
@@ -70,6 +79,7 @@ def sumbitInfo():
     db.commit()
     #clears the fields
     clearFields()
+    
 
 #show all info in database to another window
 def dbquery():
@@ -78,7 +88,7 @@ def dbquery():
     customerDataQuery.title("Show All Data")
     customerDataQuery.iconbitmap('PNCLogo.ico')
     customerDataQuery.geometry('800x600')
-
+    ic(db)  
     #query/shows all data to new window
     cursor.execute("SELECT * FROM customers")
     result = cursor.fetchall()
@@ -92,6 +102,7 @@ def dbquery():
             num += 1
     csvButton = Button(customerDataQuery, text="Save as Spreadsheet", command=lambda:exportToExcel(result))
     csvButton.grid(row=index+1,column=0)
+    
 
 #export to csv excel https://www.youtube.com/watch?v=2MMwfNKN1_s&list=PLCC34OHNcOtoC6GglhF3ncJ5rLwQrLGnV&index=32
 def exportToExcel(_result):
